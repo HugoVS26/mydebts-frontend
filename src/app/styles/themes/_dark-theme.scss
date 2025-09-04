@@ -1,0 +1,28 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+@use './_brand-palette' as bp;
+
+$dark-surfaces: (
+  background: map.get(bp.$neutral-palette, 10),
+  surface: map.get(bp.$neutral-palette, 20),
+  on-background: map.get(bp.$neutral-palette, 100),
+  on-surface: map.get(bp.$neutral-palette, 100),
+);
+
+$dark-theme: (
+  color: (
+    primary: bp.$primary-palette,
+    secondary: bp.$secondary-palette,
+    tertiary: bp.$tertiary-palette,
+    error: bp.$error-palette,
+    theme-type: dark,
+  ),
+  sys: $dark-surfaces,
+  typography: (
+    plain-family: 'Rambla, sans-serif',
+    brand-family: 'Aldrich, sans-serif',
+    bold-weight: 700,
+    regular-weight: 400,
+  ),
+  density: 0,
+) !default;
