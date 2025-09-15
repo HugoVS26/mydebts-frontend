@@ -1,0 +1,27 @@
+<div class="debt-card" [ngClass]="{
+                'debt-card__status--paid': debt.status === 'paid',
+                'debt-card__status--unpaid': debt.status === 'unpaid',
+                'debt-card__status--overdue': debt.status === 'overdue'
+              }">
+  <mat-card class="debt-card__body">
+    <mat-card-header class="debt-card__header">
+      <mat-card-title class="debt-card__title">{{ debt.description | slice:0:30 }}{{debt.description.length > 30 ? '...'
+        : '' }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content class="debt-card__content">
+      <div class="debt-card__detail">
+        <span><b>{{debt.debtor.displayName}}</b> owes you <b>{{ debt.amount | currency: 'EUR':'symbol':'1.0-2'
+            }}</b></span>
+      </div>
+      <div class="debt-card__detail debt-card__status">
+        @if (statusIcons[debt.status]) {
+        <mat-icon class="debt-card__status-icon" fontSet="{{ statusIcons[debt.status].fontSet }}">
+          {{ statusIcons[debt.status].icon }}
+        </mat-icon>
+        }
+        <span class="debt-card__status-text">{{ debt.status | titlecase }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
