@@ -9,7 +9,7 @@
     "test": "ng test",
     "serve:ssr:mydebts-frontend": "node dist/mydebts-frontend/server/server.mjs",
     "format": "prettier --write 'src/**/*.{ts,html,css,scss,json,md}'",
-    "prepare": "husky init",
+    "prepare": "husky",
     "lint": "ng lint"
   },
   "prettier": {
@@ -56,14 +56,11 @@
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "jasmine-core": "~5.9.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
+    "jsdom": "^27.0.0",
     "lint-staged": "^16.1.6",
     "prettier": "3.6.2",
     "typescript": "~5.9.2",
-    "typescript-eslint": "8.40.0"
+    "typescript-eslint": "8.40.0",
+    "vitest": "^3.2.4"
   }
 }
