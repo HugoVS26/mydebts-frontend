@@ -1,0 +1,113 @@
+@use 'sass:color';
+@use 'sass:map';
+@use '../../../../styles/themes/brand-palette' as palettes;
+
+$note-color: map.get(palettes.$primary-palette, 90);
+$note-fold: color.adjust($note-color, $lightness: -10%) transparent;
+
+.debt-card {
+  position: relative;
+  background: $note-color;
+  margin: 3em auto;
+  min-height: 8em;
+  max-width: 300px;
+  color: map.get(palettes.$neutral-palette, 10);
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2em;
+    left: 0;
+    right: 2em;
+    border-width: 1em;
+    border-style: solid;
+    border-color: $note-color;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -2em;
+    right: 0;
+    border-width: 2em 2em 0 0;
+    border-style: solid;
+    border-color: $note-fold;
+  }
+
+  &__body {
+    background: none;
+    box-shadow: none;
+    border: none;
+  }
+
+  &__header {
+    padding-bottom: 0.8em;
+    padding-top: 0.8em;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  &__content {
+    padding-bottom: 0.8em;
+    padding-top: 0.8em;
+  }
+
+  &__detail {
+    font-size: 14px;
+    padding-bottom: 0.6em;
+  }
+}
+
+.debt-card__status--paid {
+  $bg: map.get(palettes.$tertiary-palette, 90);
+  background-color: $bg !important;
+
+  &::after {
+    border-color: $bg;
+  }
+  &::before {
+    border-color: color.adjust($bg, $lightness: -10%) transparent;
+  }
+}
+
+.debt-card__status--unpaid {
+  $bg: map.get(palettes.$primary-palette, 90);
+  background-color: $bg !important;
+
+  &::after {
+    border-color: $bg;
+  }
+  &::before {
+    border-color: color.adjust($bg, $lightness: -10%) transparent;
+  }
+}
+
+.debt-card__status--overdue {
+  $bg: map.get(palettes.$error-palette, 70);
+  background-color: $bg !important;
+
+  &::after {
+    border-color: $bg;
+  }
+  &::before {
+    border-color: color.adjust($bg, $lightness: -10%) transparent;
+  }
+}
+
+.debt-card__status {
+  display: flex;
+  align-items: center;
+
+  &-icon {
+    font-size: 1rem;
+    align-content: center;
+  }
+
+  &-text {
+    font-weight: bold;
+  }
+}
