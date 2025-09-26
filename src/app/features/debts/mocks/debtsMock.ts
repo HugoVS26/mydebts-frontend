@@ -1,6 +1,6 @@
-import type { Debt } from '../models/debt.model';
+import type { IDebt } from '../models/debt.model';
 
-export const debtMock: Debt = {
+export const debtMock: IDebt = {
   _id: '1',
   debtor: {
     _id: '2',
@@ -27,7 +27,7 @@ export const debtMock: Debt = {
   updatedAt: '2025-01-01T10:00:00Z',
 };
 
-export const debtsMock: Debt[] = [
+export const debtsMock: IDebt[] = [
   {
     _id: '1',
     debtor: {
@@ -103,6 +103,87 @@ export const debtsMock: Debt[] = [
     debtDate: '2025-03-01',
     dueDate: '2025-03-05',
     status: 'overdue',
+    createdAt: '2025-03-01T08:30:00Z',
+    updatedAt: '2025-03-05T10:15:00Z',
+  },
+];
+
+export const unpaidDebtsMock: IDebt[] = [
+  {
+    _id: '1',
+    debtor: {
+      _id: '2',
+      firstName: 'John',
+      lastName: 'Doe',
+      displayName: 'John Doe',
+      email: 'john@example.com',
+      role: 'user',
+    },
+    creditor: {
+      _id: '3',
+      firstName: 'Jane',
+      lastName: 'Smith',
+      displayName: 'Jane Smith',
+      email: 'jane@example.com',
+      role: 'user',
+    },
+    amount: 150.75,
+    description: 'Lunch payment',
+    debtDate: '2025-01-01',
+    dueDate: '2025-01-15',
+    status: 'unpaid',
+    createdAt: '2025-01-01T10:00:00Z',
+    updatedAt: '2025-01-01T10:00:00Z',
+  },
+  {
+    _id: '2',
+    debtor: {
+      _id: '4',
+      firstName: 'Alice',
+      lastName: 'Johnson',
+      displayName: 'Alice Johnson',
+      email: 'alice@example.com',
+      role: 'user',
+    },
+    creditor: {
+      _id: '3',
+      firstName: 'Jane',
+      lastName: 'Smith',
+      displayName: 'Jane Smith',
+      email: 'jane@example.com',
+      role: 'user',
+    },
+    amount: 75.5,
+    description: 'Coffee and snacks',
+    debtDate: '2025-02-10',
+    dueDate: '2025-02-12',
+    status: 'unpaid',
+    createdAt: '2025-02-10T09:00:00Z',
+    updatedAt: '2025-02-12T14:00:00Z',
+  },
+  {
+    _id: '3',
+    debtor: {
+      _id: '5',
+      firstName: 'Bob',
+      lastName: 'Williams',
+      displayName: 'Bob Williams',
+      email: 'bob@example.com',
+      role: 'user',
+    },
+    creditor: {
+      _id: '3',
+      firstName: 'Jane',
+      lastName: 'Smith',
+      displayName: 'Jane Smith',
+      email: 'jane@example.com',
+      role: 'user',
+    },
+    amount: 200,
+    description: 'Project reimbursement',
+    debtDate: '2025-03-01',
+    dueDate: '2025-03-05',
+    status: 'unpaid',
     createdAt: '2025-03-01T08:30:00Z',
     updatedAt: '2025-03-05T10:15:00Z',
   },

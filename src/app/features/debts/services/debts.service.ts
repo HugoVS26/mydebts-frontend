@@ -3,11 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import type { Observable } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-import type { Debt } from '../models/debt.model';
+import type { IDebt } from '../models/debt.model';
 
 interface GetDebtsResponse {
   message: string;
-  debts: Debt[];
+  debts: IDebt[];
 }
 
 @Injectable({
