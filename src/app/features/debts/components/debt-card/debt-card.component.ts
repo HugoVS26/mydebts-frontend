@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import type { Debt } from '../../models/debt.model';
+import type { IDebt } from '../../models/debt.model';
 
 @Component({
   selector: 'app-debt-card',
@@ -13,7 +13,7 @@ import type { Debt } from '../../models/debt.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DebtCardComponent {
-  @Input() public debt!: Debt;
+  @Input() public debt!: IDebt;
 
   public statusIcons = {
     paid: { icon: 'check', fontSet: 'material-icons' },
