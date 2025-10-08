@@ -6,7 +6,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { firstValueFrom, of } from 'rxjs';
 
 import { DebtCardList } from './debt-card-list';
-import { DebtsService } from '../../services/debts.service';
+import { DebtsService } from '../../services/debts';
 import { debtsMock as unpaidDebtsMock } from '../../mocks/debtsMock';
 
 describe('Given a DebtList component', () => {

@@ -8,8 +8,8 @@ import type { IDebt } from '../../models/debt.model';
   selector: 'app-debt-card',
   standalone: true,
   imports: [CommonModule, MatCardModule, MatIconModule],
-  templateUrl: './debt-card.component.html',
-  styleUrls: ['./debt-card.component.scss'],
+  templateUrl: './debt-card.html',
+  styleUrls: ['./debt-card.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DebtCardComponent {
