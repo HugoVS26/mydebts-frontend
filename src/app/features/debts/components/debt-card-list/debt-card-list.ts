@@ -6,8 +6,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
-import { DebtCardComponent } from '../debt-card/debt-card.component';
-import { DebtsService } from '../../services/debts.service';
+import { DebtCardComponent } from '../debt-card/debt-card';
+import { DebtsService } from '../../services/debts';
 import type { IDebt } from '../../models/debt.model';
 
 interface DebtColumns {

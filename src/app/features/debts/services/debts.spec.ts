@@ -4,7 +4,7 @@ import { provideHttpClientTesting, HttpTestingController } from '@angular/common
 import { provideZonelessChangeDetection } from '@angular/core';
 
 import { environment } from 'src/environments/environment';
-import { DebtsService } from './debts.service';
+import { DebtsService } from './debts';
 import { debtsMock } from '../mocks/debtsMock';
 
 describe('Given a DebtsService injectable', () => {
