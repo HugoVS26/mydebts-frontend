@@ -2,12 +2,7 @@
 @use '@angular/material' as mat;
 @use './_brand-palette' as bp;
 
-$dark-surfaces: (
-  background: map.get(bp.$neutral-palette, 10),
-  surface: map.get(bp.$neutral-palette, 20),
-  on-background: map.get(bp.$neutral-palette, 100),
-  on-surface: map.get(bp.$neutral-palette, 100),
-);
+$dark-surfaces: ();
 
 $dark-theme: (
   color: (
