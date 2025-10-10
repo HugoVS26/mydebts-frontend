@@ -1,17 +1,38 @@
+@use 'sass:map';
 @use '@angular/material' as mat;
 @use './app/styles/themes/_light-theme' as light-theme;
 @use './app/styles/themes/_dark-theme' as dark-theme;
+@use './app/styles/themes/_brand-palette' as bp;
 
 html {
   scroll-behavior: smooth;
 }
 
 html.light-theme {
-  @include mat.theme(light-theme.$light-theme);
+  color-scheme: light;
+
+  @include mat.theme(
+    light-theme.$light-theme,
+    $overrides: (
+      primary: map.get(bp.$primary-palette, 80),
+      surface: map.get(bp.$neutral-palette, 90),
+      background: map.get(bp.$neutral-palette, 95),
+      on-surface: map.get(bp.$neutral-palette, 10),
+      on-background: map.get(bp.$neutral-palette, 10)
+    )
+  );
 }
 
 html.dark-theme {
-  @include mat.theme(dark-theme.$dark-theme);
+  @include mat.theme(
+    dark-theme.$dark-theme,
+    $overrides: (
+      surface: map.get(bp.$neutral-palette, 20),
+      background: map.get(bp.$neutral-palette, 10),
+      on-background: map.get(bp.$neutral-palette, 100),
+      on-surface: map.get(bp.$neutral-palette, 100)
+    )
+  );
 }
 
 body {
