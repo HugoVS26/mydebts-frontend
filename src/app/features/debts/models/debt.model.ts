@@ -2,8 +2,8 @@ import type { User } from '../../users/model/user.model';
 
 export interface IDebt {
   _id: string;
-  debtor: User;
-  creditor: User;
+  debtor: User | string;
+  creditor: User | string;
   amount: number;
   description: string;
   debtDate: string;
@@ -20,4 +20,18 @@ export interface IDebtFilter {
   status?: 'paid' | 'unpaid' | 'overdue';
   sortField?: SortField;
   sortOrder?: SortOrder;
+}
+
+export interface IDebtCreate {
+  debtor: User;
+  description: string;
+  amount: number;
+  debtDate?: Date;
+  dueDate?: Date;
+}
+
+export interface IDebtUpdate {
+  description: string;
+  amount: number;
+  dueDate?: Date;
 }
