@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { BehaviorSubject, combineLatest, map, shareReplay, tap } from 'rxjs';
 import type { Observable } from 'rxjs';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -10,14 +11,14 @@ import { DebtCardComponent } from '../debt-card/debt-card';
 import { DebtsService } from '../../services/debts';
 import type { IDebt } from '../../models/debt.model';
 
-interface DebtColumns {
+export interface DebtColumns {
   unpaid: IDebt[];
   paid: IDebt[];
   overdue: IDebt[];
 }
 
 interface DebtorOption {
-  _id: string;
+  _id?: string;
   name: string;
 }
 
@@ -35,7 +36,7 @@ const SORT_OPTIONS = [
 @Component({
   selector: 'app-debt-card-list',
   standalone: true,
-  imports: [DebtCardComponent, AsyncPipe, MatDividerModule, MatSelectModule],
+  imports: [DebtCardComponent, AsyncPipe, MatButtonToggleModule, MatDividerModule, MatSelectModule],
   templateUrl: './debt-card-list.html',
   styleUrls: ['./debt-card-list.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,6 +51,17 @@ export class DebtCardList {
       map((result) => result.matches),
       shareReplay({ refCount: true }),
     );
+
+  /** Toggle mode for creditor or debtor */
+  private mode$ = new BehaviorSubject<'creditor' | 'debtor'>('creditor');
+
+  public get mode(): 'creditor' | 'debtor' {
+    return this.mode$.value;
+  }
+
+  public toggleMode(mode: 'creditor' | 'debtor'): void {
+    this.mode$.next(mode);
+  }
 
   /**  Sorting */
   public sortOptions = SORT_OPTIONS;
@@ -112,17 +124,24 @@ export class DebtCardList {
 
   /** Distinct debtors (for dropdown) */
   private _lastDebtorsSnapshot: DebtorOption[] | null = null;
-  public debtors$: Observable<DebtorOption[]> = this.debtsRaw$.pipe(
-    map((debts) => {
+
+  public debtors$: Observable<DebtorOption[]> = combineLatest([this.debtsRaw$, this.mode$]).pipe(
+    map(([debts, mode]) => {
       const mapById = new Map<string, DebtorOption>();
+      const currentUserId = '68adda76e019d1a45a6ae1fe';
+
       for (const debt of debts) {
-        if (debt.debtor?._id && !mapById.has(debt.debtor._id)) {
-          mapById.set(debt.debtor._id, {
-            _id: debt.debtor._id,
-            name: debt.debtor.displayName,
-          });
-        }
+        const otherUser = mode === 'creditor' ? debt.debtor : debt.creditor;
+
+        if (otherUser === currentUserId || !otherUser) continue;
+
+        const id = typeof otherUser === 'string' ? otherUser : (otherUser._id ?? 'unknown');
+        const name =
+          typeof otherUser === 'string' ? otherUser : (otherUser.displayName ?? 'Unnamed');
+
+        if (!mapById.has(id)) mapById.set(id, { _id: id, name });
       }
+
       return Array.from(mapById.values());
     }),
     tap((list) => (this._lastDebtorsSnapshot = list)),
@@ -140,12 +159,32 @@ export class DebtCardList {
   public filteredDebts$: Observable<DebtColumns> = combineLatest([
     this.debtsRaw$,
     this.sortSelection$,
+    this.mode$,
     this.debtorSelection$,
   ]).pipe(
-    map(([debts, sort, debtorIds]) => {
-      const filtered = debtorIds.length
-        ? debts.filter((debt) => debt.debtor && debtorIds.includes(debt.debtor._id))
-        : debts;
+    map(([debts, sort, mode, selectedDebtors]) => {
+      const currentUserId = '68adda76e019d1a45a6ae1fe';
+
+      const filtered = debts.filter((debt) => {
+        const otherUser = mode === 'creditor' ? debt.debtor : debt.creditor;
+
+        const otherUserId =
+          typeof otherUser === 'string' ? otherUser : (otherUser._id ?? 'unknown');
+        const matchesSelection =
+          selectedDebtors.length === 0 || selectedDebtors.includes(otherUserId);
+
+        const isNotCurrentUser =
+          (typeof otherUser === 'string' && otherUser !== currentUserId) ||
+          (typeof otherUser === 'object' && otherUser._id !== currentUserId);
+
+        const involvesCurrentUser =
+          mode === 'creditor'
+            ? (typeof debt.creditor === 'string' ? debt.creditor : debt.creditor._id) ===
+              currentUserId
+            : (typeof debt.debtor === 'string' ? debt.debtor : debt.debtor._id) === currentUserId;
+
+        return matchesSelection && isNotCurrentUser && involvesCurrentUser;
+      });
 
       return {
         unpaid: this.sortDebts(

@@ -1,32 +1,42 @@
-<div class="debt-list__filters">
-  <mat-form-field appearance="outline" class="debt-list__select">
-    <mat-label>Sort debts</mat-label>
-    <mat-select [(value)]="selectedSort" (selectionChange)="applySortSelection($event.value)">
-      @for (option of sortOptions; track option.value) {
-      <mat-option [value]="option.value">{{ option.label }}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" class="debt-list__select">
-    <mat-label>Filter by debtors</mat-label>
-    <mat-select [(value)]="selectedDebtors" (selectionChange)="applyDebtorSelection($event.value)" multiple>
-      <mat-select-trigger>
-        {{ firstSelectedDebtorName }}
-        @if ((selectedDebtors.length) > 1) {
-        <span class="additional-selection">
-          (+{{ selectedDebtors.length - 1 }}
-          {{ selectedDebtors.length === 2 ? 'other' : 'others' }})
-        </span>
-        }
-      </mat-select-trigger>
+<div class="debt-list__header">
+  <div class="debt-list__mode-toggle">
+    <mat-button-toggle-group [value]="mode" (change)="toggleMode($event.value)">
+      <mat-button-toggle value="creditor">I'm Creditor</mat-button-toggle>
+      <mat-button-toggle value="debtor">I'm Debtor</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
 
-      @for (debtor of (debtors$ | async); track debtor._id) {
-      <mat-option [value]="debtor._id">
-        {{ debtor.name }}
-      </mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+  <div class="debt-list__filters">
+    <mat-form-field appearance="outline" class="debt-list__select">
+      <mat-label>Sort debts</mat-label>
+      <mat-select [(value)]="selectedSort" (selectionChange)="applySortSelection($event.value)">
+        @for (option of sortOptions; track option.value) {
+        <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="debt-list__select">
+      <mat-label>{{ mode === 'debtor' ? 'Filter by creditors' : 'Filter by debtors' }}</mat-label>
+      <mat-select [(value)]="selectedDebtors" (selectionChange)="applyDebtorSelection($event.value)" multiple>
+        <mat-select-trigger>
+          {{ firstSelectedDebtorName }}
+          @if ((selectedDebtors.length) > 1) {
+          <span class="additional-selection">
+            (+{{ selectedDebtors.length - 1 }}
+            {{ selectedDebtors.length === 2 ? 'other' : 'others' }})
+          </span>
+          }
+        </mat-select-trigger>
+
+        @for (debtor of (debtors$ | async); track debtor._id) {
+        <mat-option [value]="debtor._id">
+          {{ debtor.name }}
+        </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
 </div>
 
 <div class="debt-list">
@@ -34,7 +44,7 @@
     <h3 class="debt-list__column-title">Unpaid</h3>
     <ol class="debt-list__cards">
       @for (debt of (filteredDebts$ | async)?.['unpaid']; track trackByDebtId($index, debt)) {
-      <li class="debt-list__card-item"><app-debt-card [debt]="debt" /></li>
+      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
       } @empty {
       <li class="debt-list__card-item debt-list__empty">
         You have no unpaid debts. Enjoy your day! 🎉
@@ -49,7 +59,7 @@
     <h3 class="debt-list__column-title">Paid</h3>
     <ol class="debt-list__cards">
       @for (debt of (filteredDebts$ | async)?.['paid']; track trackByDebtId($index, debt)) {
-      <li class="debt-list__card-item"><app-debt-card [debt]="debt" /></li>
+      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
       } @empty {
       <li class="debt-list__card-item debt-list__empty">
         No paid debts found. Looks like you’re all caught up! ✅
@@ -64,7 +74,7 @@
     <h3 class="debt-list__column-title">Overdue</h3>
     <ol class="debt-list__cards">
       @for (debt of (filteredDebts$ | async)?.['overdue']; track trackByDebtId($index, debt)) {
-      <li class="debt-list__card-item"><app-debt-card [debt]="debt" /></li>
+      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
       } @empty {
       <li class="debt-list__card-item debt-list__empty">
         No overdue debts. Good job staying on top of things! 💪

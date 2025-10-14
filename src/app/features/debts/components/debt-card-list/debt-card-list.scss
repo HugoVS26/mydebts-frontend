@@ -23,6 +23,40 @@
     align-items: stretch;
   }
 
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+
+    @media (min-width: 1024px) {
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      align-content: flex-start;
+      padding: 1rem 2rem;
+
+      .debt-list__filters {
+        order: 1;
+      }
+      .debt-list__mode-toggle {
+        order: 2;
+        justify-content: flex-end;
+      }
+    }
+  }
+
+  &__mode-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
   &__filters {
     display: flex;
     align-items: center;
@@ -74,7 +108,7 @@
   &__divider {
     width: 60%;
     height: 1px;
-    margin: 2rem 0;
+    margin-top: 2rem;
 
     @media (min-width: 1024px) {
       width: 1px;

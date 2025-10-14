@@ -11,9 +11,15 @@
 
     <mat-card-content class="debt-card__content">
       <div class="debt-card__detail">
-        <span><b>{{debt.debtor.displayName}}</b> owes you <b>{{ debt.amount | currency: 'EUR':'symbol':'1.0-2'
+        @if (mode === 'creditor') {
+        <span><b>{{counterpartyName}}</b> owes you <b>{{ debt.amount | currency: 'EUR':'symbol':'1.0-2'
             }}</b></span>
+        } @else
+        {<span>You owe <b>{{counterpartyName}} </b> <b>{{ debt.amount | currency:
+            'EUR':'symbol':'1.0-2'
+            }}</b></span>}
       </div>
+
       <div class="debt-card__detail debt-card__status">
         @if (statusIcons[debt.status]) {
         <mat-icon class="debt-card__status-icon" fontSet="{{ statusIcons[debt.status].fontSet }}">
