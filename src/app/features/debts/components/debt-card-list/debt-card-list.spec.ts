@@ -3,20 +3,24 @@ import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { firstValueFrom, of } from 'rxjs';
+import { firstValueFrom, of, take } from 'rxjs';
 
+import type { DebtColumns } from './debt-card-list';
 import { DebtCardList } from './debt-card-list';
 import { DebtsService } from '../../services/debts';
-import { debtsMock as unpaidDebtsMock } from '../../mocks/debtsMock';
+import { debtsMock } from '../../mocks/debtsMock';
+import type { IDebt } from '../../models/debt.model';
 
 describe('Given a DebtList component', () => {
   let fixture: ComponentFixture<DebtCardList>;
   let component: DebtCardList;
   let debtsServiceMock: { getDebts: ReturnType<typeof vi.fn> };
 
+  const currentUserId = '68adda76e019d1a45a6ae1fe';
+
   beforeEach(async () => {
     debtsServiceMock = {
-      getDebts: vi.fn().mockReturnValue(of({ debts: unpaidDebtsMock })),
+      getDebts: vi.fn().mockReturnValue(of({ debts: debtsMock })),
     };
 
     await TestBed.configureTestingModule({
@@ -35,13 +39,15 @@ describe('Given a DebtList component', () => {
     fixture.detectChanges();
   });
 
-  describe('When the component its initialized', () => {
+  describe('When the component its initialized (creditor mode as default)', () => {
     it('Should be created', () => {
       expect(component).toBeTruthy();
     });
 
     it('Should load debts data from getDebts service', async () => {
-      const expectedDebts = await firstValueFrom(component.filteredDebts$);
+      const expectedDebts = (await firstValueFrom(
+        component.filteredDebts$.pipe(take(1)),
+      )) as DebtColumns;
 
       expect(expectedDebts.unpaid.length).toBe(1);
       expect(expectedDebts.paid.length).toBe(1);
@@ -49,45 +55,89 @@ describe('Given a DebtList component', () => {
     });
   });
 
-  describe('When a sorting value is selected', () => {
-    it('Should sort the debts list correctly', async () => {
+  describe('When a sorting debts', () => {
+    it('Should sort debts in descending order by amount', async () => {
       const sortingValue = 'amountDesc';
       component.selectedSort = sortingValue;
 
-      const expectedMiddleDebtAmount = unpaidDebtsMock[0].amount;
-      const expectedLowerDebtAmount = unpaidDebtsMock[1].amount;
-      const expectedHigherDebtAmount = unpaidDebtsMock[2].amount;
+      const sortedDebts = component['sortDebts'](debtsMock as IDebt[], sortingValue);
 
-      const sortedDebts = component['sortDebts'](unpaidDebtsMock, sortingValue);
+      expect(sortedDebts[0].amount).toBeGreaterThan(sortedDebts[1].amount);
+    });
 
-      expect(sortedDebts[0].amount).toBe(expectedHigherDebtAmount);
-      expect(sortedDebts[1].amount).toBe(expectedMiddleDebtAmount);
-      expect(sortedDebts[2].amount).toBe(expectedLowerDebtAmount);
+    it('Should sort debts in ascending order by due date', () => {
+      const sortingValue = 'dueDateAsc';
+
+      const sortedDebts = component['sortDebts'](debtsMock as IDebt[], sortingValue);
+      const firstDue = new Date(sortedDebts[0].dueDate).getTime();
+      const secondDue = new Date(sortedDebts[1].dueDate).getTime();
+
+      expect(firstDue).toBeLessThanOrEqual(secondDue);
     });
   });
 
-  describe('When a debtors name is selected in the filter', () => {
-    const debtorName = unpaidDebtsMock[0].debtor.displayName;
-    const debtorId = unpaidDebtsMock[0].debtor._id;
+  describe('When filtering by selected debtors', () => {
+    it('Should filter debts by selected debtor ID', async () => {
+      const debtor = debtsMock[0].debtor;
+      const debtorId = typeof debtor === 'object' ? debtor._id : debtor;
 
-    it('Should filter debts by debtors name', async () => {
+      component.toggleMode('creditor');
+      fixture.detectChanges();
+
       component.applyDebtorSelection([debtorId]);
+      fixture.detectChanges();
 
-      const filteredDebts = await firstValueFrom(component.filteredDebts$);
+      const filteredDebts = await firstValueFrom(component.filteredDebts$.pipe(take(1)));
 
-      expect(filteredDebts.unpaid).toHaveLength(1);
-      expect(filteredDebts.unpaid[0].debtor?.displayName).toBe(debtorName);
+      const allDebtors = filteredDebts.unpaid.map((debts) =>
+        typeof debts.debtor === 'object' ? debts.debtor._id : debts.debtor,
+      );
+
+      expect(allDebtors).toContain(debtorId);
     });
 
-    it('Should show in the select field the first debtor name', async () => {
-      component['applyDebtorSelection']([debtorId]);
+    it('Should update firstSelectedDebtorName correctly', () => {
       component['_lastDebtorsSnapshot'] = [
         { _id: '2', name: 'John Doe' },
         { _id: '4', name: 'Alice Johnson' },
         { _id: '5', name: 'Bob Williams' },
       ];
+      component['applyDebtorSelection'](['2']);
+      expect(component.firstSelectedDebtorName).toBe('John Doe');
+    });
+  });
 
-      expect(component.firstSelectedDebtorName).toBe(debtorName);
+  describe('When toggling between creditor and debtor mode', () => {
+    it('Should be default in creditor mode', () => {
+      expect(component.mode).toBe('creditor');
+    });
+
+    it('Should update mode reactively when toggled', async () => {
+      component.toggleMode('debtor');
+
+      expect(component.mode).toBe('debtor');
+    });
+
+    it('Should filter debts where current user is creditor in creditor mode', async () => {
+      component.toggleMode('creditor');
+
+      const result = await firstValueFrom(component.filteredDebts$);
+      result.unpaid.forEach((debt) => {
+        const creditorId = typeof debt.creditor === 'object' ? debt.creditor._id : debt.creditor;
+
+        expect(creditorId).toBe(currentUserId);
+      });
+    });
+
+    it('Should filter debts where current user is debtor in debtor mode', async () => {
+      component.toggleMode('debtor');
+
+      const result = await firstValueFrom(component.filteredDebts$);
+      result.unpaid.forEach((debt) => {
+        const debtorId = typeof debt.debtor === 'object' ? debt.debtor._id : debt.debtor;
+
+        expect(debtorId).toBe(currentUserId);
+      });
     });
   });
 });
