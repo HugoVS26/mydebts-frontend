@@ -1,0 +1,39 @@
+.debt-form {
+  display: flex;
+  margin-top: 2rem;
+  justify-content: center;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    padding: 2rem 1.6rem;
+  }
+
+  &__title {
+    text-align: center;
+  }
+
+  &__mode-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  mat-card {
+    width: 100%;
+    max-width: 400px;
+    margin: 1rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+  }
+
+  mat-card-actions {
+    padding: 2rem 1.6rem;
+    gap: 1rem;
+  }
+}
