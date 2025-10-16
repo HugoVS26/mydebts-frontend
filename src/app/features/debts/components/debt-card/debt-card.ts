@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import type { IDebt } from '../../models/debt.model';
+import type { IDebt } from '../../types/debt';
 
 @Component({
   selector: 'app-debt-card',
@@ -12,7 +12,7 @@ import type { IDebt } from '../../models/debt.model';
   styleUrls: ['./debt-card.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DebtCardComponent {
+export class DebtCard {
   @Input() public debt!: IDebt;
 
   @Input() public mode: 'creditor' | 'debtor' = 'creditor';
