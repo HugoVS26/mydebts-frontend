@@ -1,4 +1,4 @@
-import type { IDebt } from '../models/debt.model';
+import type { IDebt } from '../types/debt';
 
 export const debtMock: IDebt = {
   _id: '1',
