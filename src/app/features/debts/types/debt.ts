@@ -13,17 +13,9 @@ export interface IDebt {
   updatedAt: string;
 }
 
-export type SortField = 'amount' | 'debtDate' | 'dueDate';
-export type SortOrder = 'asc' | 'desc';
-
-export interface IDebtFilter {
-  status?: 'paid' | 'unpaid' | 'overdue';
-  sortField?: SortField;
-  sortOrder?: SortOrder;
-}
-
 export interface IDebtCreate {
-  debtor: User;
+  debtor: string;
+  creditor: string;
   description: string;
   amount: number;
   debtDate?: Date;
@@ -31,7 +23,17 @@ export interface IDebtCreate {
 }
 
 export interface IDebtUpdate {
-  description: string;
-  amount: number;
+  description?: string;
+  amount?: number;
   dueDate?: Date;
 }
+
+export interface IDebtFilter {
+  status?: 'paid' | 'unpaid' | 'overdue';
+  sortField?: SortField;
+  sortOrder?: SortOrder;
+}
+
+export type SortField = 'amount' | 'debtDate' | 'dueDate';
+
+export type SortOrder = 'asc' | 'desc';

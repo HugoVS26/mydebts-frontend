@@ -1,20 +1,20 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { DebtCardComponent } from './debt-card';
+import { DebtCard } from './debt-card';
 import { debtMock } from '../../mocks/debtsMock';
 
 describe('Given a DebtCardComponent', () => {
-  let fixture: ComponentFixture<DebtCardComponent>;
-  let component: DebtCardComponent;
+  let fixture: ComponentFixture<DebtCard>;
+  let component: DebtCard;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DebtCardComponent],
+      imports: [DebtCard],
       providers: [provideZonelessChangeDetection()],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DebtCardComponent);
+    fixture = TestBed.createComponent(DebtCard);
     component = fixture.componentInstance;
 
     component.debt = debtMock;
@@ -70,7 +70,7 @@ describe('Given a DebtCardComponent', () => {
 
   describe('When the component is rendered in debtor mode', () => {
     it('Should render the debt details correctly', () => {
-      const debtorFixture = TestBed.createComponent(DebtCardComponent);
+      const debtorFixture = TestBed.createComponent(DebtCard);
       const debtorComponent = debtorFixture.componentInstance;
 
       debtorComponent.debt = debtMock;
