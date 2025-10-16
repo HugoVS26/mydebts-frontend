@@ -7,9 +7,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
-import { DebtCardComponent } from '../debt-card/debt-card';
+import { DebtCard } from '../debt-card/debt-card';
 import { DebtsService } from '../../services/debts';
-import type { IDebt } from '../../models/debt.model';
+import type { IDebt } from '../../types/debt';
 
 export interface DebtColumns {
   unpaid: IDebt[];
@@ -23,8 +23,8 @@ interface DebtorOption {
 }
 
 const SORT_OPTIONS = [
-  { value: 'creationDateAsc', label: 'Creation date: Oldest' },
   { value: 'creationDateDesc', label: 'Creation date: Newest' },
+  { value: 'creationDateAsc', label: 'Creation date: Oldest' },
   { value: 'amountAsc', label: 'Amount: Lowest' },
   { value: 'amountDesc', label: 'Amount: Highest' },
   { value: 'debtDateAsc', label: 'Debt date: Earliest' },
@@ -36,7 +36,7 @@ const SORT_OPTIONS = [
 @Component({
   selector: 'app-debt-card-list',
   standalone: true,
-  imports: [DebtCardComponent, AsyncPipe, MatButtonToggleModule, MatDividerModule, MatSelectModule],
+  imports: [DebtCard, AsyncPipe, MatButtonToggleModule, MatDividerModule, MatSelectModule],
   templateUrl: './debt-card-list.html',
   styleUrls: ['./debt-card-list.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -65,7 +65,7 @@ export class DebtCardList {
 
   /**  Sorting */
   public sortOptions = SORT_OPTIONS;
-  private sortSelection$ = new BehaviorSubject<string>('creationDateAsc');
+  private sortSelection$ = new BehaviorSubject<string>('creationDateDesc');
 
   public get selectedSort(): string {
     return this.sortSelection$.value;

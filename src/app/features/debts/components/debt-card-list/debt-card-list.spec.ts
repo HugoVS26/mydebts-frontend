@@ -9,7 +9,7 @@ import type { DebtColumns } from './debt-card-list';
 import { DebtCardList } from './debt-card-list';
 import { DebtsService } from '../../services/debts';
 import { debtsMock } from '../../mocks/debtsMock';
-import type { IDebt } from '../../models/debt.model';
+import type { IDebt } from '../../types/debt';
 
 describe('Given a DebtList component', () => {
   let fixture: ComponentFixture<DebtCardList>;
