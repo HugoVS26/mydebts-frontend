@@ -3,11 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import type { Observable } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-import type { IDebt } from '../models/debt.model';
+import type { IDebt, IDebtCreate, IDebtUpdate } from '../types/debt';
 
-interface GetDebtsResponse {
+interface MultipleDebtsResponse {
   message: string;
   debts: IDebt[];
+}
+
+interface SingleDebtResponse {
+  message: string;
+  debt: IDebt;
 }
 
 @Injectable({
@@ -18,7 +23,19 @@ export class DebtsService {
 
   private http = inject(HttpClient);
 
-  public getDebts(): Observable<GetDebtsResponse> {
-    return this.http.get<GetDebtsResponse>(this.apirUrl);
+  public getDebts(): Observable<MultipleDebtsResponse> {
+    return this.http.get<MultipleDebtsResponse>(this.apirUrl);
+  }
+
+  public getDebtById(debtId: string): Observable<SingleDebtResponse> {
+    return this.http.get<SingleDebtResponse>(`${this.apirUrl}/${debtId}`);
+  }
+
+  public createDebt(debt: IDebtCreate): Observable<SingleDebtResponse> {
+    return this.http.post<SingleDebtResponse>(this.apirUrl, debt);
+  }
+
+  public updateDebt(debtId: string, debt: IDebtUpdate): Observable<SingleDebtResponse> {
+    return this.http.put<SingleDebtResponse>(`${this.apirUrl}/${debtId}`, debt);
   }
 }
