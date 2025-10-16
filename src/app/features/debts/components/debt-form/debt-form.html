@@ -1,0 +1,88 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="debt-form">
+  <mat-card>
+    <mat-card-header class="debt-form__header">
+      <mat-card-title class="debt-form__title">
+        {{ mode === 'create' ? 'Create Debt' : 'Update Debt' }}
+      </mat-card-title>
+
+      @if (mode === 'create') {
+      <div class="debt-form__mode-toggle">
+        <mat-button-toggle-group [value]="debtMode()" (change)="debtMode.set($event.value)" aria-label="Debt mode">
+          <mat-button-toggle value="creditor">Someone owes me</mat-button-toggle>
+          <mat-button-toggle value="debtor">I owe someone</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+      }
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="form-grid">
+        @if (mode === 'create') {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ counterpartyLabel }}</mat-label>
+          <input matInput formControlName="counterparty" [placeholder]="counterpartyPlaceholder" />
+          @if (form.get('counterparty')?.hasError('required')) {
+          <mat-error>{{ counterpartyLabel }} is required</mat-error>
+          }
+          @if (form.get('counterparty')?.hasError('minlength')) {
+          <mat-error>{{ counterpartyLabel }} must be at least 2 characters</mat-error>
+          }
+        </mat-form-field>
+        }
+
+        <mat-form-field appearance="outline">
+          <mat-label>Description</mat-label>
+          <input matInput formControlName="description" placeholder="What is this debt for?" />
+          @if (form.get('description')?.hasError('required')) {
+          <mat-error>Description is required</mat-error>
+          }
+          @if (form.get('description')?.hasError('minlength')) {
+          <mat-error>Description must be at least 3 characters</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Amount (€)</mat-label>
+          <input matInput type="number" formControlName="amount" placeholder="0.00" step="0.01" />
+          @if (form.get('amount')?.hasError('required')) {
+          <mat-error>Amount is required</mat-error>
+          }
+          @if (form.get('amount')?.hasError('min')) {
+          <mat-error>Amount must be greater than 0</mat-error>
+          }
+        </mat-form-field>
+
+        @if (mode === 'create') {
+        <mat-form-field appearance="outline">
+          <mat-label>Debt Date</mat-label>
+          <input matInput [matDatepicker]="debtDatePicker" formControlName="debtDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="debtDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #debtDatePicker></mat-datepicker>
+        </mat-form-field>
+        }
+
+        <mat-form-field appearance="outline">
+          <mat-label>Due Date</mat-label>
+          <input matInput [matDatepicker]="dueDatePicker" formControlName="dueDate" />
+          <mat-hint>Optional</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #dueDatePicker></mat-datepicker>
+          @if (form.get('dueDate')?.hasError('beforeDebtDate')) {
+          <mat-error>Due date must be equal to or after the debt date</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      @if (hasNoChanges) {
+      <mat-error class="no-changes-error">You must change at least one field to update</mat-error>
+      }
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-stroked-button color="secondary" type="button" (click)="onCancel()">Cancel</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+        {{ mode === 'create' ? 'Create' : 'Update' }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</form>
