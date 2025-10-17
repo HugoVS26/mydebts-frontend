@@ -134,4 +134,31 @@ export const debtsMock: IDebt[] = [
   },
 ];
 
+export const createDebtMock = (): IDebt => ({
+  _id: '1',
+  debtor: {
+    _id: '2',
+    firstName: 'John',
+    lastName: 'Doe',
+    displayName: 'John Doe',
+    email: 'john@example.com',
+    role: 'user',
+  },
+  creditor: {
+    _id: '68adda76e019d1a45a6ae1fe',
+    firstName: 'Jane',
+    lastName: 'Smith',
+    displayName: 'Jane Smith',
+    email: 'jane@example.com',
+    role: 'user',
+  },
+  amount: 150.75,
+  description: 'Lunch payment',
+  debtDate: '2025-01-01',
+  dueDate: '2025-01-15',
+  status: 'unpaid',
+  createdAt: '2025-01-01T10:00:00Z',
+  updatedAt: '2025-01-01T10:00:00Z',
+});
+
 export const unpaidDebtsMock: IDebt[] = debtsMock.filter((d) => d.status === 'unpaid');
