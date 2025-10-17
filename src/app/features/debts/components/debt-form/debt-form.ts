@@ -94,7 +94,6 @@ export class DebtForm implements OnInit, OnChanges {
       dueDate: [this.initialData?.dueDate ? new Date(this.initialData.dueDate) : null],
     });
 
-    // Add dueDate validator based on debtDate
     if (!isCreateMode && this.initialData?.debtDate) {
       this.form
         .get('dueDate')
@@ -104,13 +103,11 @@ export class DebtForm implements OnInit, OnChanges {
         .get('dueDate')
         ?.setValidators([this.dueDateValidator(this.form.get('debtDate')?.value)]);
 
-      // Update dueDate validator when debtDate changes
       this.form.get('debtDate')?.valueChanges.subscribe(() => {
         this.form.get('dueDate')?.updateValueAndValidity();
       });
     }
 
-    // Store initial values and add validator for update mode
     if (!isCreateMode) {
       this.initialFormValues = { ...this.form.value };
       this.form.setValidators(this.atLeastOneFieldChangedValidator());
@@ -122,13 +119,16 @@ export class DebtForm implements OnInit, OnChanges {
     return (control: AbstractControl): ValidationErrors | null => {
       if (!control.value) return null;
 
-      const dueDate = new Date(control.value);
-      const compareDate = referenceDate || this.form?.get('debtDate')?.value;
+      const compareDate =
+        this.mode === 'create' ? this.form?.get('debtDate')?.value : referenceDate;
 
       if (!compareDate) return null;
 
-      const dueDateOnly = new Date(dueDate.setHours(0, 0, 0, 0));
-      const debtDateOnly = new Date(new Date(compareDate).setHours(0, 0, 0, 0));
+      const dueDateOnly = new Date(control.value);
+      dueDateOnly.setHours(0, 0, 0, 0);
+
+      const debtDateOnly = new Date(compareDate);
+      debtDateOnly.setHours(0, 0, 0, 0);
 
       return dueDateOnly >= debtDateOnly ? null : { beforeDebtDate: true };
     };
@@ -187,7 +187,6 @@ export class DebtForm implements OnInit, OnChanges {
 
       this.formSubmit.emit(payload);
     } else {
-      // Only send changed fields
       const payload: IDebtUpdate = {};
 
       if (description !== this.initialFormValues.description) {
