@@ -15,27 +15,39 @@ interface SingleDebtResponse {
   debt: IDebt;
 }
 
+interface DeleteDebtResponse {
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class DebtsService {
-  private apirUrl = `${environment.apiUrl}/debts`;
+  private readonly apiUrl = `${environment.apiUrl}/debts`;
 
   private http = inject(HttpClient);
 
-  public getDebts(): Observable<MultipleDebtsResponse> {
-    return this.http.get<MultipleDebtsResponse>(this.apirUrl);
+  getDebts(): Observable<MultipleDebtsResponse> {
+    return this.http.get<MultipleDebtsResponse>(this.apiUrl);
   }
 
-  public getDebtById(debtId: string): Observable<SingleDebtResponse> {
-    return this.http.get<SingleDebtResponse>(`${this.apirUrl}/${debtId}`);
+  getDebtById(debtId: string): Observable<SingleDebtResponse> {
+    return this.http.get<SingleDebtResponse>(`${this.apiUrl}/${debtId}`);
   }
 
-  public createDebt(debt: IDebtCreate): Observable<SingleDebtResponse> {
-    return this.http.post<SingleDebtResponse>(this.apirUrl, debt);
+  createDebt(debt: IDebtCreate): Observable<SingleDebtResponse> {
+    return this.http.post<SingleDebtResponse>(this.apiUrl, debt);
   }
 
-  public updateDebt(debtId: string, debt: IDebtUpdate): Observable<SingleDebtResponse> {
-    return this.http.put<SingleDebtResponse>(`${this.apirUrl}/${debtId}`, debt);
+  updateDebt(debtId: string, debt: IDebtUpdate): Observable<SingleDebtResponse> {
+    return this.http.put<SingleDebtResponse>(`${this.apiUrl}/${debtId}`, debt);
+  }
+
+  deleteDebt(debtId: string): Observable<DeleteDebtResponse> {
+    return this.http.delete<DeleteDebtResponse>(`${this.apiUrl}/${debtId}`);
+  }
+
+  markDebtAsPaid(debtId: string): Observable<SingleDebtResponse> {
+    return this.http.patch<SingleDebtResponse>(`${this.apiUrl}/${debtId}/paid`, {});
   }
 }

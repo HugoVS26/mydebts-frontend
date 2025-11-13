@@ -45,7 +45,7 @@ export class DebtCardList {
   private debtsService = inject(DebtsService);
   private breakpointObserver = inject(BreakpointObserver);
 
-  public isDesktop$: Observable<boolean> = this.breakpointObserver
+  isDesktop$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Large, Breakpoints.XLarge])
     .pipe(
       map((result) => result.matches),
@@ -55,25 +55,25 @@ export class DebtCardList {
   /** Toggle mode for creditor or debtor */
   private mode$ = new BehaviorSubject<'creditor' | 'debtor'>('creditor');
 
-  public get mode(): 'creditor' | 'debtor' {
+  get mode(): 'creditor' | 'debtor' {
     return this.mode$.value;
   }
 
-  public toggleMode(mode: 'creditor' | 'debtor'): void {
+  toggleMode(mode: 'creditor' | 'debtor'): void {
     this.mode$.next(mode);
   }
 
   /**  Sorting */
-  public sortOptions = SORT_OPTIONS;
+  sortOptions = SORT_OPTIONS;
   private sortSelection$ = new BehaviorSubject<string>('creationDateDesc');
 
-  public get selectedSort(): string {
+  get selectedSort(): string {
     return this.sortSelection$.value;
   }
-  public set selectedSort(value: string) {
+  set selectedSort(value: string) {
     this.applySortSelection(value);
   }
-  public applySortSelection(sort: string): void {
+  applySortSelection(sort: string): void {
     this.sortSelection$.next(sort);
   }
 
@@ -106,13 +106,13 @@ export class DebtCardList {
   /** Debtor filter */
   private debtorSelection$ = new BehaviorSubject<string[]>([]);
 
-  public get selectedDebtors(): string[] {
+  get selectedDebtors(): string[] {
     return this.debtorSelection$.value;
   }
-  public set selectedDebtors(value: string[]) {
+  set selectedDebtors(value: string[]) {
     this.applyDebtorSelection(value);
   }
-  public applyDebtorSelection(debtors: string[]): void {
+  applyDebtorSelection(debtors: string[]): void {
     this.debtorSelection$.next(debtors ?? []);
   }
 
@@ -125,7 +125,7 @@ export class DebtCardList {
   /** Distinct debtors (for dropdown) */
   private _lastDebtorsSnapshot: DebtorOption[] | null = null;
 
-  public debtors$: Observable<DebtorOption[]> = combineLatest([this.debtsRaw$, this.mode$]).pipe(
+  debtors$: Observable<DebtorOption[]> = combineLatest([this.debtsRaw$, this.mode$]).pipe(
     map(([debts, mode]) => {
       const mapById = new Map<string, DebtorOption>();
       const currentUserId = '68adda76e019d1a45a6ae1fe';
@@ -149,14 +149,14 @@ export class DebtCardList {
   );
 
   /** First selected debtor name (for mat-select-trigger) */
-  public get firstSelectedDebtorName(): string {
+  get firstSelectedDebtorName(): string {
     if (!this._lastDebtorsSnapshot || this.selectedDebtors.length === 0) return '';
     const first = this._lastDebtorsSnapshot.find((d) => d._id === this.selectedDebtors[0]);
     return first?.name ?? '';
   }
 
   /** Final filtered debts */
-  public filteredDebts$: Observable<DebtColumns> = combineLatest([
+  filteredDebts$: Observable<DebtColumns> = combineLatest([
     this.debtsRaw$,
     this.sortSelection$,
     this.mode$,
@@ -204,7 +204,7 @@ export class DebtCardList {
   );
 
   /** Helpers */
-  public trackByDebtId(index: number, debt: IDebt): string {
+  trackByDebtId(index: number, debt: IDebt): string {
     return debt._id;
   }
 }

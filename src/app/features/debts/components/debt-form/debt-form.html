@@ -80,7 +80,7 @@
 
     <mat-card-actions align="end">
       <button mat-stroked-button color="secondary" type="button" (click)="onCancel()">Cancel</button>
-      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
+      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || hasNoChanges">
         {{ mode === 'create' ? 'Create' : 'Update' }}
       </button>
     </mat-card-actions>

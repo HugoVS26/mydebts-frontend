@@ -3,7 +3,7 @@
                 'debt-card__status--unpaid': debt.status === 'unpaid',
                 'debt-card__status--overdue': debt.status === 'overdue'
               }">
-  <mat-card class="debt-card__body">
+  <mat-card class="debt-card__data">
     <mat-card-header class="debt-card__header">
       <mat-card-title class="debt-card__title">{{ debt.description | slice:0:30 }}{{debt.description.length > 30 ? '...'
         : '' }}</mat-card-title>

@@ -49,23 +49,23 @@ interface DebtFormValues {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DebtForm implements OnInit, OnChanges {
-  @Input() public mode: 'create' | 'update' = 'create';
-  @Input() public initialData?: IDebt;
+  @Input() mode: 'create' | 'update' = 'create';
+  @Input() initialData?: IDebt;
 
-  @Output() public formSubmit = new EventEmitter<IDebtCreate | IDebtUpdate>();
-  @Output() public formCancel = new EventEmitter<void>();
+  @Output() formSubmit = new EventEmitter<IDebtCreate | IDebtUpdate>();
+  @Output() formCancel = new EventEmitter<void>();
 
-  public form!: FormGroup;
-  public debtMode = signal<'creditor' | 'debtor'>('creditor');
+  form!: FormGroup;
+  debtMode = signal<'creditor' | 'debtor'>('creditor');
 
   private formBuilder = inject(FormBuilder);
   private initialFormValues: Partial<DebtFormValues> = {};
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.initForm();
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['initialData'] && !changes['initialData'].firstChange) {
       this.initForm();
     }
@@ -75,8 +75,7 @@ export class DebtForm implements OnInit, OnChanges {
   private initForm(): void {
     const isCreateMode = this.mode === 'create';
 
-    this.form = this.formBuilder.group({
-      counterparty: ['', isCreateMode ? [Validators.required, Validators.minLength(1)] : []],
+    const baseControls = {
       description: [
         this.initialData?.description ?? '',
         isCreateMode ? [Validators.required, Validators.minLength(1)] : [Validators.minLength(1)],
@@ -85,13 +84,26 @@ export class DebtForm implements OnInit, OnChanges {
         this.initialData?.amount ?? null,
         isCreateMode ? [Validators.required, Validators.min(0.01)] : [Validators.min(0.01)],
       ],
-      debtDate: [
-        {
-          value: this.initialData?.debtDate ? new Date(this.initialData.debtDate) : new Date(),
-          disabled: !isCreateMode,
-        },
-      ],
       dueDate: [this.initialData?.dueDate ? new Date(this.initialData.dueDate) : null],
+    };
+
+    const createModeControls = isCreateMode
+      ? {
+          counterparty: ['', [Validators.required, Validators.minLength(1)]],
+          debtDate: [new Date()],
+        }
+      : {
+          debtDate: [
+            {
+              value: this.initialData?.debtDate ? new Date(this.initialData.debtDate) : new Date(),
+              disabled: true,
+            },
+          ],
+        };
+
+    this.form = this.formBuilder.group({
+      ...baseControls,
+      ...createModeControls,
     });
 
     if (!isCreateMode && this.initialData?.debtDate) {
@@ -158,7 +170,7 @@ export class DebtForm implements OnInit, OnChanges {
   }
 
   /** Form submission */
-  public onSubmit(): void {
+  onSubmit(): void {
     if (this.form.invalid) return;
 
     const { counterparty, description, amount, debtDate, dueDate } = this.form.value;
@@ -203,22 +215,22 @@ export class DebtForm implements OnInit, OnChanges {
     }
   }
 
-  public onCancel(): void {
+  onCancel(): void {
     this.formCancel.emit();
   }
 
   /** Getters */
-  public get counterpartyLabel(): string {
+  get counterpartyLabel(): string {
     return this.debtMode() === 'creditor' ? 'Debtor' : 'Creditor';
   }
 
-  public get counterpartyPlaceholder(): string {
+  get counterpartyPlaceholder(): string {
     return this.debtMode() === 'creditor'
       ? 'Enter the name of who owes you'
       : 'Enter the name of who you owe';
   }
 
-  public get hasNoChanges(): boolean {
+  get hasNoChanges(): boolean {
     return this.mode === 'update' && this.form.hasError('noChanges');
   }
 }

@@ -44,7 +44,10 @@ describe('DebtForm', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideZonelessChangeDetection(),
-        provideRouter([]),
+        provideRouter([
+          { path: '', component: DebtFormPage },
+          { path: 'debts/:debtId', component: DebtFormPage },
+        ]),
       ],
     }).compileComponents();
 
@@ -198,7 +201,7 @@ describe('DebtForm', () => {
       expect(spy).toHaveBeenCalledWith(DEBT_ID, mockDebtUpdatePayload);
     });
 
-    it('Should navigate to home on successful update', () => {
+    it('Should navigate to debt detail on successful update', () => {
       const mockDebt = createDebtMock();
       const navigateSpy = vi.spyOn(router, 'navigate');
 
@@ -208,10 +211,10 @@ describe('DebtForm', () => {
 
       component.handleFormSubmit(mockDebtUpdatePayload);
 
-      expect(navigateSpy).toHaveBeenCalledWith([HOME_ROUTE]);
+      expect(navigateSpy).toHaveBeenCalledWith([`/debts/${DEBT_ID}`]);
     });
 
-    it('Should not navigate to home on update error', () => {
+    it('Should not navigate update error', () => {
       const navigateSpy = vi.spyOn(router, 'navigate');
       const error = new Error('Update failed');
 
@@ -224,12 +227,31 @@ describe('DebtForm', () => {
   });
 
   describe('When handling form cancellation', () => {
-    it('Should navigate to home', () => {
+    it('Should navigate to home when creating', () => {
+      vi.spyOn(activatedRoute.snapshot.paramMap, 'get').mockReturnValue(null);
+      fixture.detectChanges();
+
       const navigateSpy = vi.spyOn(router, 'navigate');
 
       component.handleFormCancel();
 
       expect(navigateSpy).toHaveBeenCalledWith([HOME_ROUTE]);
+    });
+
+    it('Should navigate to debt detail when editing a debt', () => {
+      const mockDebt = createDebtMock();
+      const navigateSpy = vi.spyOn(router, 'navigate');
+
+      vi.spyOn(activatedRoute.snapshot.paramMap, 'get').mockReturnValue(DEBT_ID);
+      vi.spyOn(debtsService, 'getDebtById').mockReturnValue(
+        of({ message: 'Success', debt: mockDebt }),
+      );
+
+      fixture.detectChanges();
+
+      component.handleFormCancel();
+
+      expect(navigateSpy).toHaveBeenCalledWith([`/debts/${DEBT_ID}`]);
     });
   });
 });
