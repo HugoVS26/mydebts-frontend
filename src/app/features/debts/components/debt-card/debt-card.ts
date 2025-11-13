@@ -13,17 +13,17 @@ import type { IDebt } from '../../types/debt';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DebtCard {
-  @Input() public debt!: IDebt;
+  @Input() debt!: IDebt;
 
-  @Input() public mode: 'creditor' | 'debtor' = 'creditor';
+  @Input() mode: 'creditor' | 'debtor' = 'creditor';
 
-  public statusIcons = {
+  statusIcons = {
     paid: { icon: 'check', fontSet: 'material-icons' },
     unpaid: { icon: 'progress_activity', fontSet: 'material-symbols-outlined' },
     overdue: { icon: 'skull', fontSet: 'material-symbols-outlined' },
   };
 
-  public get counterpartyName(): string {
+  get counterpartyName(): string {
     if (this.mode === 'creditor') {
       if (typeof this.debt.debtor === 'string') {
         return this.debt.debtor;

@@ -27,7 +27,7 @@ module.exports = tseslint.config(
       ],
 
       '@typescript-eslint/explicit-function-return-type': 'warn',
-      '@typescript-eslint/explicit-member-accessibility': ['warn', { accessibility: 'explicit' }],
+      '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'no-public' }],
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/consistent-type-imports': 'error',

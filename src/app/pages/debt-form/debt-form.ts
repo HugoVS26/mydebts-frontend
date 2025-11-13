@@ -18,11 +18,11 @@ export class DebtFormPage implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  public mode = signal<'create' | 'update'>('create');
-  public initialData = signal<IDebt | undefined>(undefined);
+  mode = signal<'create' | 'update'>('create');
+  initialData = signal<IDebt | undefined>(undefined);
   private debtId: string | null = null;
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this.debtId = this.route.snapshot.paramMap.get('debtId');
 
     if (this.debtId) {
@@ -43,7 +43,7 @@ export class DebtFormPage implements OnInit {
     });
   }
 
-  public handleFormSubmit(data: IDebtCreate | IDebtUpdate): void {
+  handleFormSubmit(data: IDebtCreate | IDebtUpdate): void {
     if (this.mode() === 'create') {
       this.debtsService.createDebt(data as IDebtCreate).subscribe({
         next: () => {
@@ -57,7 +57,7 @@ export class DebtFormPage implements OnInit {
     } else if (this.debtId) {
       this.debtsService.updateDebt(this.debtId, data as IDebtUpdate).subscribe({
         next: () => {
-          this.router.navigate(['/']);
+          this.router.navigate([`/debts/${this.debtId}`]);
         },
         error: (error) => {
           console.error('Error updating debt:', error);
@@ -67,7 +67,11 @@ export class DebtFormPage implements OnInit {
     }
   }
 
-  public handleFormCancel(): void {
-    this.router.navigate(['/']);
+  handleFormCancel(): void {
+    if (this.debtId) {
+      this.router.navigate([`/debts/${this.debtId}`]);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 }
