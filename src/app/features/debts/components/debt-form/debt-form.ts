@@ -55,19 +55,29 @@ export class DebtForm implements OnInit, OnChanges {
   @Output() formSubmit = new EventEmitter<IDebtCreate | IDebtUpdate>();
   @Output() formCancel = new EventEmitter<void>();
 
-  form!: FormGroup;
+  form: FormGroup;
   debtMode = signal<'creditor' | 'debtor'>('creditor');
+  formReady = signal(false);
 
   private formBuilder = inject(FormBuilder);
   private initialFormValues: Partial<DebtFormValues> = {};
 
+  constructor() {
+    this.form = this.formBuilder.group({
+      _placeholder: [''],
+    });
+  }
+
   ngOnInit(): void {
     this.initForm();
+    this.formReady.set(true);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['initialData'] && !changes['initialData'].firstChange) {
+    if (changes['initialData'] && !changes['initialData'].firstChange && this.formReady()) {
+      this.formReady.set(false);
       this.initForm();
+      this.formReady.set(true);
     }
   }
 
@@ -92,25 +102,20 @@ export class DebtForm implements OnInit, OnChanges {
           counterparty: ['', [Validators.required, Validators.minLength(1)]],
           debtDate: [new Date()],
         }
-      : {
-          debtDate: [
-            {
-              value: this.initialData?.debtDate ? new Date(this.initialData.debtDate) : new Date(),
-              disabled: true,
-            },
-          ],
-        };
+      : {};
 
     this.form = this.formBuilder.group({
       ...baseControls,
       ...createModeControls,
     });
 
-    if (!isCreateMode && this.initialData?.debtDate) {
-      this.form
-        .get('dueDate')
-        ?.setValidators([this.dueDateValidator(new Date(this.initialData.debtDate))]);
-    } else if (isCreateMode) {
+    const referenceDebtDate = this.initialData?.debtDate
+      ? new Date(this.initialData.debtDate)
+      : new Date();
+
+    if (!isCreateMode) {
+      this.form.get('dueDate')?.setValidators([this.dueDateValidator(referenceDebtDate)]);
+    } else {
       this.form
         .get('dueDate')
         ?.setValidators([this.dueDateValidator(this.form.get('debtDate')?.value)]);

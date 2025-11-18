@@ -128,8 +128,8 @@ describe('Given a DebtForm component', () => {
       expect(formDueDate?.getTime()).toBe(expectedDueDate.getTime());
     });
 
-    it('Should disable debtDate field', () => {
-      expect(component.form.get('debtDate')?.disabled).toBeTruthy();
+    it('Should not include debtDate field in update mode', () => {
+      expect(component.form.get('debtDate')).toBeFalsy();
     });
 
     it('Should not require a counterparty', () => {
