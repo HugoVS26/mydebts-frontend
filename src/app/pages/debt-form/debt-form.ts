@@ -20,6 +20,7 @@ export class DebtFormPage implements OnInit {
 
   mode = signal<'create' | 'update'>('create');
   initialData = signal<IDebt | undefined>(undefined);
+  isReady = signal(false);
   private debtId: string | null = null;
 
   ngOnInit(): void {
@@ -28,6 +29,8 @@ export class DebtFormPage implements OnInit {
     if (this.debtId) {
       this.mode.set('update');
       this.loadDebt(this.debtId);
+    } else {
+      this.isReady.set(true);
     }
   }
 
@@ -35,6 +38,7 @@ export class DebtFormPage implements OnInit {
     this.debtsService.getDebtById(debtId).subscribe({
       next: (response) => {
         this.initialData.set(response.debt);
+        this.isReady.set(true);
       },
       error: (error) => {
         console.error('Error loading debt:', error);
