@@ -35,6 +35,19 @@ html.dark-theme {
   );
 }
 
+.force-light-theme {
+  @include mat.theme(
+    light-theme.$light-theme,
+    $overrides: (
+      primary: map.get(bp.$primary-palette, 80),
+      surface: map.get(bp.$neutral-palette, 90),
+      background: map.get(bp.$neutral-palette, 95),
+      on-surface: map.get(bp.$neutral-palette, 10),
+      on-background: map.get(bp.$neutral-palette, 10)
+    )
+  );
+}
+
 body {
   color-scheme: light dark;
   background-color: var(--mat-sys-surface);
