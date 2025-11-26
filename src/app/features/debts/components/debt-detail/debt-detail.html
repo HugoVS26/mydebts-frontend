@@ -1,0 +1,74 @@
+<div class="debt-detail" [ngClass]="{
+  'debt-detail--paid': debt.status === 'paid',
+  'debt-detail--unpaid': debt.status === 'unpaid',
+  'debt-detail--overdue': debt.status === 'overdue'
+}">
+  <mat-card class="debt-detail__data">
+    <mat-card-header class="debt-detail__header">
+      <div class="debt-detail__header-content">
+        <mat-card-title class="debt-detail__title">{{ debt.description | slice:0:30 }}{{debt.description.length > 30 ?
+          '...'
+          : '' }}</mat-card-title>
+      </div>
+
+      <div class="debt-detail__actions force-light-theme">
+        <button mat-icon-button (click)="onEdit()" aria-label="Edit debt">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="onDelete()" aria-label="Delete debt">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content class="debt-detail__content">
+      <div class="debt-detail__amount-section">
+        <h2 class="debt-detail__amount">{{ debt.amount | currency: 'EUR':'symbol':'1.0-2' }}</h2>
+        <div class="debt-detail__status">
+          <mat-icon class="debt-detail__status-icon" fontSet="{{statusInfo.fontSet}}">
+            {{ statusInfo.icon }}
+          </mat-icon>
+          <span class="debt-detail__status-text">{{ statusInfo.label }}</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <ul class="debt-detail__info-list">
+        <li class="debt-detail__info-item">
+          <div class="debt-card__detail">
+            @if (mode === 'creditor') {
+            <span><b>{{counterparty.displayName}}</b> owes you <b>{{ debt.amount | currency: 'EUR':'symbol':'1.0-2'
+                }}</b> for {{debt.description}}</span>
+            } @else
+            {<span>You owe <b>{{counterparty.displayName}} </b> <b>{{ debt.amount | currency:
+                'EUR':'symbol':'1.0-2'
+                }}</b> for {{debt.description}}</span>}
+          </div>
+        </li>
+
+        <li class="debt-detail__info-item">
+          <span class="debt-detail__info-label"><b>Debt from:</b></span>
+          <span class="debt-detail__info-value">{{ debt.debtDate | date: 'mediumDate' }}</span>
+        </li>
+
+        @if (debt.dueDate) {
+        <li class="debt-detail__info-item">
+          <span class="debt-detail__info-label"><b>Due Date:</b></span>
+          <span class="debt-detail__info-value">{{ debt.dueDate | date: 'mediumDate' }}</span>
+        </li>
+        }
+      </ul>
+    </mat-card-content>
+
+    @if (canMarkAsPaid) {
+    <mat-card-actions class="debt-detail__footer">
+      <button matButton="outlined" class=" debt-detail__paid-button" (click)="onMarkAsPaid()"
+        aria-label="Mark debt as paid">
+        <mat-icon class="debt-detail__paid-icon">check</mat-icon>
+        Mark as Paid
+      </button>
+    </mat-card-actions>
+    }
+  </mat-card>
+</div>
