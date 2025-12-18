@@ -27,7 +27,11 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "src/styles.scss",
+              "node_modules/theme-toggles/css/around.min.css",
+              "node_modules/hamburgers/dist/hamburgers.css"
+            ]
           },
           "configurations": {
             "production": {
