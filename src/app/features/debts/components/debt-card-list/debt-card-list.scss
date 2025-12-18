@@ -1,7 +1,7 @@
 :host {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 0 16px;
   padding-bottom: 3rem;
 
   @media (min-width: 1024px) {
@@ -24,21 +24,21 @@
   }
 
   &__header {
+    padding-top: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 1.5rem;
     width: 100%;
-    padding: 1rem;
     box-sizing: border-box;
 
     @media (min-width: 1024px) {
       flex-direction: row;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       align-content: flex-start;
-      padding: 1rem 2rem;
+      padding: 1rem 0;
 
       .debt-list__filters {
         order: 1;
