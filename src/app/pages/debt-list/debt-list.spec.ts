@@ -5,6 +5,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 
 import { DebtListPage } from './debt-list';
 import { DebtsService } from '../../features/debts/services/debts';
+import { provideRouter } from '@angular/router';
 
 describe('Given a DebtListComponent page', () => {
   let component: DebtListPage;
@@ -17,6 +18,7 @@ describe('Given a DebtListComponent page', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         provideZonelessChangeDetection(),
+        provideRouter([]),
       ],
     }).compileComponents();
 
@@ -25,7 +27,9 @@ describe('Given a DebtListComponent page', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  describe('When the component its initialized', () => {
+    it('should create', () => {
+      expect(component).toBeTruthy();
+    });
   });
 });

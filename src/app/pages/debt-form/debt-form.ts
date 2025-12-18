@@ -1,6 +1,7 @@
 import type { OnInit } from '@angular/core';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Navbar } from 'src/app/shared/components/navbar/navbar';
 
 import { DebtForm } from 'src/app/features/debts/components/debt-form/debt-form';
 import { DebtsService } from 'src/app/features/debts/services/debts';
@@ -8,7 +9,7 @@ import type { IDebt, IDebtCreate, IDebtUpdate } from 'src/app/features/debts/typ
 
 @Component({
   selector: 'app-debt-form-page',
-  imports: [DebtForm],
+  imports: [DebtForm, Navbar],
   templateUrl: './debt-form.html',
   styleUrl: './debt-form.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

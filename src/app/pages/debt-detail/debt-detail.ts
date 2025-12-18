@@ -2,13 +2,14 @@ import type { OnInit } from '@angular/core';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DebtDetail } from '../../features/debts/components/debt-detail/debt-detail';
+import { Navbar } from 'src/app/shared/components/navbar/navbar';
 
 import { DebtsService } from 'src/app/features/debts/services/debts';
 import type { IDebt } from 'src/app/features/debts/types/debt';
 
 @Component({
   selector: 'app-debt-detail-page',
-  imports: [DebtDetail],
+  imports: [DebtDetail, Navbar],
   templateUrl: './debt-detail.html',
   styleUrl: './debt-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
