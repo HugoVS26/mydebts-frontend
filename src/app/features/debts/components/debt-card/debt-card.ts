@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import type { IDebt } from '../../types/debt';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-debt-card',
@@ -13,6 +14,8 @@ import type { IDebt } from '../../types/debt';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DebtCard {
+  private router = inject(Router);
+
   @Input() debt!: IDebt;
 
   @Input() mode: 'creditor' | 'debtor' = 'creditor';
@@ -41,5 +44,9 @@ export class DebtCard {
         return 'Unnamed';
       }
     }
+  }
+
+  onCardClick(): void {
+    this.router.navigate(['/debts', this.debt._id]);
   }
 }
