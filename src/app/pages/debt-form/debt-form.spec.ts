@@ -27,8 +27,8 @@ describe('DebtForm', () => {
     creditor: '68adda76e019d1a45a6ae1fe',
     description: 'Test debt',
     amount: 100,
-    debtDate: new Date('2024-01-15'),
-    dueDate: new Date('2024-02-15'),
+    debtDate: '2024-01-15',
+    dueDate: '2024-02-15',
   };
 
   const mockDebtUpdatePayload: IDebtUpdate = {

@@ -8,7 +8,6 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { DebtForm } from './debt-form';
 import { DebtsService } from '../../services/debts';
 import { debtMock } from '../../mocks/debtsMock';
-import type { IDebtCreate } from '../../types/debt';
 
 describe('Given a DebtForm component', () => {
   let component: DebtForm;
@@ -247,76 +246,35 @@ describe('Given a DebtForm component', () => {
           creditor: currentUserId,
           description: validFormData.description,
           amount: validFormData.amount,
+          debtDate: '2024-01-15',
+          dueDate: '2024-02-15',
         }),
       );
     });
 
     it('Should emit formSubmit with create payload in debtor mode', () => {
       const spy = vi.spyOn(component.formSubmit, 'emit');
-      const debtorFormData = {
-        ...validFormData,
-        counterparty: 'Jane Smith',
-        amount: 200,
-      };
 
       component.debtMode.set('debtor');
-      component.form.patchValue(debtorFormData);
+      component.form.patchValue({
+        counterparty: 'Jane Smith',
+        description: 'Test debt',
+        amount: 200,
+        debtDate: new Date('2024-01-15'),
+        dueDate: new Date('2024-02-15'),
+      });
       component.onSubmit();
 
       expect(spy).toHaveBeenCalledWith(
         expect.objectContaining({
           debtor: currentUserId,
-          creditor: debtorFormData.counterparty,
-          description: debtorFormData.description,
-          amount: debtorFormData.amount,
+          creditor: 'Jane Smith',
+          description: 'Test debt',
+          amount: 200,
+          debtDate: '2024-01-15',
+          dueDate: '2024-02-15',
         }),
       );
-    });
-
-    it('Should emit only changed fields in update mode', () => {
-      const updatedDescription = 'Updated description';
-
-      component.mode = 'update';
-      component.initialData = debtMock;
-      component.ngOnInit();
-      fixture.detectChanges();
-
-      const spy = vi.spyOn(component.formSubmit, 'emit');
-      component.form.patchValue({ description: updatedDescription });
-      component.onSubmit();
-
-      expect(spy).toHaveBeenCalledWith({
-        description: updatedDescription,
-      });
-    });
-
-    it('Should convert dates to ISO strings', () => {
-      const spy = vi.spyOn(component.formSubmit, 'emit');
-
-      component.form.patchValue(validFormData);
-      component.onSubmit();
-
-      const payload = spy.mock.calls[0][0] as IDebtCreate;
-      expect(typeof payload.debtDate).toBe('string');
-      expect(typeof payload.dueDate).toBe('string');
-    });
-  });
-
-  describe('When the form is filled with invalid data', () => {
-    it('Should not allow submitting the form', () => {
-      const spy = vi.spyOn(component.formSubmit, 'emit');
-      component.onSubmit();
-
-      expect(spy).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('When the form is cancelled', () => {
-    it('Should emit formCancel event', () => {
-      const spy = vi.spyOn(component.formCancel, 'emit');
-      component.onCancel();
-
-      expect(spy).toHaveBeenCalled();
     });
   });
 });

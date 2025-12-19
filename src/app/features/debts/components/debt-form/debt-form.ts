@@ -190,16 +190,16 @@ export class DebtForm implements OnInit, OnChanges {
               creditor: currentUserId,
               description,
               amount,
-              debtDate: debtDate?.toISOString(),
-              dueDate: dueDate?.toISOString(),
+              debtDate: this.formatDateToYYYYMMDD(debtDate),
+              dueDate: dueDate ? this.formatDateToYYYYMMDD(dueDate) : undefined,
             }
           : {
               debtor: currentUserId,
               creditor: counterparty,
               description,
               amount,
-              debtDate: debtDate?.toISOString(),
-              dueDate: dueDate?.toISOString(),
+              debtDate: this.formatDateToYYYYMMDD(debtDate),
+              dueDate: dueDate ? this.formatDateToYYYYMMDD(dueDate) : undefined,
             };
 
       this.formSubmit.emit(payload);
@@ -213,11 +213,22 @@ export class DebtForm implements OnInit, OnChanges {
         payload.amount = amount;
       }
       if (dueDate?.getTime() !== this.initialFormValues.dueDate?.getTime()) {
-        payload.dueDate = dueDate?.toISOString();
+        payload.dueDate = this.formatDateToYYYYMMDD(dueDate);
       }
 
       this.formSubmit.emit(payload);
     }
+  }
+
+  /** Format date to string */
+  private formatDateToYYYYMMDD(date: Date | null): string | undefined {
+    if (!date) return undefined;
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 
   onCancel(): void {
