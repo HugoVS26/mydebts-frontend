@@ -1,4 +1,4 @@
-<div class="debt-card" [ngClass]="{
+<button class="debt-card" (click)="onCardClick()" [ngClass]="{
                 'debt-card__status--paid': debt.status === 'paid',
                 'debt-card__status--unpaid': debt.status === 'unpaid',
                 'debt-card__status--overdue': debt.status === 'overdue'
@@ -30,4 +30,4 @@
       </div>
     </mat-card-content>
   </mat-card>
-</div>
+</button>

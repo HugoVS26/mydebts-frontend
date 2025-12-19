@@ -18,14 +18,14 @@ export interface IDebtCreate {
   creditor: string;
   description: string;
   amount: number;
-  debtDate?: Date;
-  dueDate?: Date;
+  debtDate?: string;
+  dueDate?: string;
 }
 
 export interface IDebtUpdate {
   description?: string;
   amount?: number;
-  dueDate?: Date;
+  dueDate?: string;
 }
 
 export interface IDebtFilter {

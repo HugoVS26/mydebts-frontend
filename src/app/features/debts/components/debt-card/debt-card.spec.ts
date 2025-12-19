@@ -3,19 +3,23 @@ import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { DebtCard } from './debt-card';
 import { debtMock } from '../../mocks/debtsMock';
+import { Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 
 describe('Given a DebtCardComponent', () => {
   let fixture: ComponentFixture<DebtCard>;
   let component: DebtCard;
+  let router: Router;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DebtCard],
-      providers: [provideZonelessChangeDetection()],
+      providers: [provideZonelessChangeDetection(), provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DebtCard);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
 
     component.debt = debtMock;
 
@@ -85,6 +89,17 @@ describe('Given a DebtCardComponent', () => {
 
       expect(debtData).toContain(counterpartyName);
       expect(debtData).toContain('You owe');
+    });
+  });
+
+  describe('When card is clicked', () => {
+    it('Then it should navigate to debt detail page with the correct debt id', () => {
+      const navigateSpy = vi.spyOn(router, 'navigate');
+      component.debt = { ...debtMock, _id: '456' };
+
+      component.onCardClick();
+
+      expect(navigateSpy).toHaveBeenCalledWith(['/debts', '456']);
     });
   });
 });

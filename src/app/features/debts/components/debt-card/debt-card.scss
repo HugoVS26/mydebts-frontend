@@ -6,11 +6,34 @@ $note-color: map.get(palettes.$primary-palette, 90);
 $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
 
 .debt-card {
+  // Button reset
+  appearance: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  text-align: left;
+  width: 100%;
+
+  // Card styles
+  cursor: pointer;
   position: relative;
   background: $note-color;
   min-height: 8em;
   max-width: 300px;
   color: map.get(palettes.$neutral-palette, 10);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: 4px;
+  }
 
   &::after {
     content: '';
@@ -37,6 +60,7 @@ $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
     background: none;
     box-shadow: none;
     border: none;
+    pointer-events: none;
   }
 
   &__header {
