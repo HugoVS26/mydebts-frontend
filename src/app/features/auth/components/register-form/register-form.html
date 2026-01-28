@@ -144,7 +144,9 @@
         </button>
 
         <div class="register-form__footer">
-          <p>Already have an account? <a routerLink="/login">Log in</a></p>
+          <p>Already have an account? <button type="button" class="register-form__link"
+              (click)="onNavigateToLogin()">Log
+              in</button></p>
         </div>
       </div>
     </mat-card-actions>

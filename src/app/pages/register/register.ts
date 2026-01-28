@@ -1,5 +1,5 @@
-import type { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import type { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 import { Navbar } from 'src/app/shared/components/navbar/navbar';
@@ -45,5 +45,9 @@ export class RegisterPage {
         this.errorMessage.set(message);
       },
     });
+  }
+
+  onNavigateToLogin(): void {
+    this.router.navigate(['/login']);
   }
 }
