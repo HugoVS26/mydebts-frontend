@@ -1,3 +1,4 @@
+import type { OutputEmitterRef } from '@angular/core';
 import { Component, inject, input, output, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,6 +7,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+
 import type { RegisterRequest } from '../../types/auth';
 import { passwordComplexityValidator } from '../../validators/password-complexity.validator';
 import { passwordMatchValidator } from '../../validators/password-match-validator';
@@ -27,11 +29,12 @@ import { passwordMatchValidator } from '../../validators/password-match-validato
 export class RegisterForm {
   formBuilder = inject(FormBuilder);
 
-  submitForm = output<RegisterRequest>();
-
-  hide = signal(true);
+  submitForm: OutputEmitterRef<RegisterRequest> = output<RegisterRequest>();
+  navigateToLogin: OutputEmitterRef<void> = output<void>();
 
   errorMessage = input<string | null>(null);
+
+  hide = signal(true);
 
   registerForm = this.formBuilder.nonNullable.group({
     firstName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
@@ -73,6 +76,10 @@ export class RegisterForm {
   clickEvent(event: MouseEvent): void {
     event.preventDefault();
     this.hide.update((value) => !value);
+  }
+
+  onNavigateToLogin(): void {
+    this.navigateToLogin.emit();
   }
 
   get firstName(): FormControl<string> {
