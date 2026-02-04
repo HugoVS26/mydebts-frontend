@@ -1,4 +1,4 @@
-import type { AuthResponse, RegisterRequest } from '../types/auth';
+import type { AuthResponse, LoginRequest, RegisterRequest } from '../types/auth';
 
 export const registerRequestMock: RegisterRequest = {
   firstName: 'José',
@@ -17,4 +17,9 @@ export const authResponseMock: AuthResponse = {
     email: 'jose@example.com',
     role: 'user',
   },
+};
+
+export const loginRequestMock: LoginRequest = {
+  email: 'jose@example.com',
+  password: 'Password123!',
 };
