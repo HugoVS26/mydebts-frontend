@@ -3,6 +3,7 @@ import { DebtListPage } from './pages/debt-list/debt-list';
 import { DebtFormPage } from './pages/debt-form/debt-form';
 import { DebtDetailPage } from './pages/debt-detail/debt-detail';
 import { RegisterPage } from './pages/register/register';
+import { LoginPage } from './pages/login/login';
 
 export const routes: Routes = [
   { path: '', component: DebtListPage },
@@ -11,4 +12,5 @@ export const routes: Routes = [
   { path: 'debts/:debtId/edit', component: DebtFormPage },
   { path: 'debts/:debtId', component: DebtDetailPage },
   { path: 'register', component: RegisterPage },
+  { path: 'login', component: LoginPage },
 ];
