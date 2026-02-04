@@ -1,0 +1,92 @@
+.login-form {
+  display: flex;
+  justify-content: center;
+
+  &__card {
+    width: 100%;
+    max-width: 400px;
+    margin: 1rem;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    padding: 2rem 1.6rem;
+  }
+
+  &__title {
+    text-align: center;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+  }
+
+  &__field {
+    width: 100%;
+  }
+
+  &__actions {
+    padding: 2rem 1.6rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__actions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    width: 100%;
+  }
+
+  &__submit {
+    width: 100%;
+  }
+
+  &__footer {
+    text-align: center;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__link {
+    background: none;
+    border: none;
+    color: var(--mat-sys-primary);
+    text-decoration: none;
+    font-weight: 550;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.25rem;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--mat-sys-primary);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+
+  &__error-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.2rem;
+    color: #c62828;
+
+    mat-icon {
+      font-size: 1.25rem;
+      width: 1.6rem;
+      height: 1.6rem;
+      color: #c62828;
+    }
+  }
+}
