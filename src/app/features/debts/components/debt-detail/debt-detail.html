@@ -23,7 +23,8 @@
 
     <mat-card-content class="debt-detail__content">
       <div class="debt-detail__amount-section">
-        <h2 class="debt-detail__amount">{{ debt.amount | currency: 'EUR':'symbol':'1.0-2' }}</h2>
+        <h2 class="debt-detail__amount">{{ debt.amount |
+          number:'1.2-2':'es-ES' }} €</h2>
         <div class="debt-detail__status">
           <mat-icon class="debt-detail__status-icon" fontSet="{{statusInfo.fontSet}}">
             {{ statusInfo.icon }}
@@ -37,13 +38,12 @@
       <ul class="debt-detail__info-list">
         <li class="debt-detail__info-item">
           <div class="debt-card__detail">
-            @if (mode === 'creditor') {
-            <span><b>{{counterparty.displayName}}</b> owes you <b>{{ debt.amount | currency: 'EUR':'symbol':'1.0-2'
-                }}</b> for {{debt.description}}</span>
+            @if (mode() === 'creditor') {
+            <span><b class="debt-detail__counterparty">{{counterparty.displayName}}</b> owes you <b>{{ debt.amount |
+                number:'1.2-2':'es-ES' }} €</b> for {{debt.description}}</span>
             } @else
-            {<span>You owe <b>{{counterparty.displayName}} </b> <b>{{ debt.amount | currency:
-                'EUR':'symbol':'1.0-2'
-                }}</b> for {{debt.description}}</span>}
+            {<span>You owe <b class="debt-detail__counterparty">{{counterparty.displayName}} </b> <b>{{ debt.amount |
+                number:'1.2-2':'es-ES' }} €</b> for {{debt.description}}</span>}
           </div>
         </li>
 

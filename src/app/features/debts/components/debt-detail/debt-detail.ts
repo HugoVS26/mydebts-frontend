@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +10,7 @@ import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { DebtsService } from '../../services/debts';
+import { AuthService } from 'src/app/features/auth/services/auth';
 import type { IDebt } from '../../types/debt';
 import { ConfirmDialog } from 'src/app/shared/components/confirm-dialog/confirm-dialog/confirm-dialog';
 
@@ -43,9 +44,9 @@ interface StatusInfo {
 })
 export class DebtDetail {
   @Input() debt!: IDebt;
-  @Input() mode: 'creditor' | 'debtor' = 'creditor';
 
   private readonly debtsService = inject(DebtsService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
 
@@ -55,8 +56,18 @@ export class DebtDetail {
     overdue: { icon: 'skull', fontSet: 'material-symbols-outlined', label: 'overdue' },
   };
 
+  protected readonly mode = computed<'creditor' | 'debtor'>(() => {
+    const currentUserId = this.authService.currentUser()?._id;
+    if (!currentUserId) return 'creditor';
+
+    const creditorId =
+      typeof this.debt.creditor === 'string' ? this.debt.creditor : this.debt.creditor._id;
+
+    return currentUserId === creditorId ? 'creditor' : 'debtor';
+  });
+
   get counterparty(): CounterpartyInfo {
-    const user = this.mode === 'creditor' ? this.debt.debtor : this.debt.creditor;
+    const user = this.mode() === 'creditor' ? this.debt.debtor : this.debt.creditor;
 
     if (typeof user === 'string') {
       return {
@@ -73,10 +84,6 @@ export class DebtDetail {
       firstName: user?.firstName ?? null,
       lastName: user?.lastName ?? null,
     };
-  }
-
-  get roleLabel(): string {
-    return this.mode === 'creditor' ? 'Debtor' : 'Creditor';
   }
 
   get statusInfo(): StatusInfo {

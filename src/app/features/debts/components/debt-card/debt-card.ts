@@ -47,6 +47,9 @@ export class DebtCard {
   }
 
   onCardClick(): void {
+    if (!this.debt?._id) {
+      return;
+    }
     this.router.navigate(['/debts', this.debt._id]);
   }
 }

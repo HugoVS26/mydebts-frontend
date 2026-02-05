@@ -6,7 +6,6 @@ $note-color: map.get(palettes.$primary-palette, 90);
 $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
 
 .debt-card {
-  // Button reset
   appearance: none;
   border: none;
   padding: 0;
@@ -16,8 +15,6 @@ $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
   background: none;
   text-align: left;
   width: 100%;
-
-  // Card styles
   cursor: pointer;
   position: relative;
   background: $note-color;
@@ -82,6 +79,10 @@ $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
   &__detail {
     font-size: 14px;
     padding-bottom: 0.6em;
+  }
+
+  &__counterparty {
+    text-transform: capitalize;
   }
 }
 

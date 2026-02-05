@@ -1,23 +1,35 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideNativeDateAdapter } from '@angular/material/core';
 
 import { DebtForm } from './debt-form';
 import { DebtsService } from '../../services/debts';
-import { debtMock } from '../../mocks/debtsMock';
+import { debtMock, currentUserMock } from '../../mocks/debtsMock';
+import type { User } from 'src/app/features/auth/types/user';
+import { AuthService } from 'src/app/features/auth/services/auth';
 
 describe('Given a DebtForm component', () => {
   let component: DebtForm;
   let fixture: ComponentFixture<DebtForm>;
+  let authServiceMock: {
+    currentUserId: string | null;
+    currentUser: ReturnType<typeof signal<User | null>>;
+  };
 
   beforeEach(async () => {
+    authServiceMock = {
+      currentUserId: currentUserMock._id,
+      currentUser: signal<User | null>(currentUserMock),
+    };
+
     await TestBed.configureTestingModule({
       imports: [DebtForm],
       providers: [
         DebtsService,
+        { provide: AuthService, useValue: authServiceMock },
         provideZonelessChangeDetection(),
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -230,8 +242,6 @@ describe('Given a DebtForm component', () => {
       dueDate: new Date('2024-02-15T00:00:00.000Z'),
     };
 
-    const currentUserId = '68adda76e019d1a45a6ae1fe';
-
     it('Should emit formSubmit with create payload in creditor mode', () => {
       const spy = vi.spyOn(component.formSubmit, 'emit');
       component.debtMode.set('creditor');
@@ -243,7 +253,7 @@ describe('Given a DebtForm component', () => {
       expect(spy).toHaveBeenCalledWith(
         expect.objectContaining({
           debtor: validFormData.counterparty,
-          creditor: currentUserId,
+          creditor: currentUserMock._id,
           description: validFormData.description,
           amount: validFormData.amount,
           debtDate: '2024-01-15',
@@ -267,7 +277,7 @@ describe('Given a DebtForm component', () => {
 
       expect(spy).toHaveBeenCalledWith(
         expect.objectContaining({
-          debtor: currentUserId,
+          debtor: currentUserMock._id,
           creditor: 'Jane Smith',
           description: 'Test debt',
           amount: 200,
@@ -275,6 +285,28 @@ describe('Given a DebtForm component', () => {
           dueDate: '2024-02-15',
         }),
       );
+    });
+  });
+
+  describe('When user is not authenticated', () => {
+    it('Should not emit formSubmit when currentUserId is null', () => {
+      authServiceMock.currentUserId = null;
+      authServiceMock.currentUser.set(null);
+
+      const spy = vi.spyOn(component.formSubmit, 'emit');
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
+
+      component.form.patchValue({
+        counterparty: 'John Doe',
+        description: 'Test debt',
+        amount: 100,
+      });
+      component.onSubmit();
+
+      expect(spy).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledWith('User not authenticated');
+
+      consoleErrorSpy.mockRestore();
     });
   });
 });

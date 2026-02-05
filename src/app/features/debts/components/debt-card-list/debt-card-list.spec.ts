@@ -1,32 +1,42 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { firstValueFrom, of, take } from 'rxjs';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
 
 import type { DebtColumns } from './debt-card-list';
 import { DebtCardList } from './debt-card-list';
 import { DebtsService } from '../../services/debts';
-import { debtsMock } from '../../mocks/debtsMock';
+import { AuthService } from '../../../auth/services/auth';
+import { debtsMock, currentUserMock } from '../../mocks/debtsMock';
 import type { IDebt } from '../../types/debt';
+import type { User } from '../../../auth/types/user';
+
+registerLocaleData(localeEs);
 
 describe('Given a DebtList component', () => {
   let fixture: ComponentFixture<DebtCardList>;
   let component: DebtCardList;
   let debtsServiceMock: { getDebts: ReturnType<typeof vi.fn> };
-
-  const currentUserId = '68adda76e019d1a45a6ae1fe';
+  let authServiceMock: { currentUser: ReturnType<typeof signal<User | null>> };
 
   beforeEach(async () => {
     debtsServiceMock = {
       getDebts: vi.fn().mockReturnValue(of({ debts: debtsMock })),
     };
 
+    authServiceMock = {
+      currentUser: signal<User | null>(currentUserMock),
+    };
+
     await TestBed.configureTestingModule({
       imports: [DebtCardList],
       providers: [
         { provide: DebtsService, useValue: debtsServiceMock },
+        { provide: AuthService, useValue: authServiceMock },
         provideZonelessChangeDetection(),
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -55,7 +65,7 @@ describe('Given a DebtList component', () => {
     });
   });
 
-  describe('When a sorting debts', () => {
+  describe('When sorting debts', () => {
     it('Should sort debts in descending order by amount', async () => {
       const sortingValue = 'amountDesc';
       component.selectedSort = sortingValue;
@@ -77,7 +87,7 @@ describe('Given a DebtList component', () => {
   });
 
   describe('When filtering by selected debtors', () => {
-    it('Should filter debts by selected debtor ID', async () => {
+    it('Should filter debts by selected debtor _id', async () => {
       const debtor = debtsMock[0].debtor;
       const debtorId = typeof debtor === 'object' ? debtor._id : debtor;
 
@@ -89,20 +99,18 @@ describe('Given a DebtList component', () => {
 
       const filteredDebts = await firstValueFrom(component.filteredDebts$.pipe(take(1)));
 
-      const allDebtors = filteredDebts.unpaid.map((debts) =>
-        typeof debts.debtor === 'object' ? debts.debtor._id : debts.debtor,
+      const allDebtors = filteredDebts.unpaid.map((debt) =>
+        typeof debt.debtor === 'object' ? debt.debtor._id : debt.debtor,
       );
 
       expect(allDebtors).toContain(debtorId);
     });
 
-    it('Should update firstSelectedDebtorName correctly', () => {
-      component['_lastDebtorsSnapshot'] = [
-        { _id: '2', name: 'John Doe' },
-        { _id: '4', name: 'Alice Johnson' },
-        { _id: '5', name: 'Bob Williams' },
-      ];
+    it('Should update firstSelectedDebtorName correctly', async () => {
+      await firstValueFrom(component.debtors$.pipe(take(1)));
+
       component['applyDebtorSelection'](['2']);
+
       expect(component.firstSelectedDebtorName).toBe('John Doe');
     });
   });
@@ -122,10 +130,13 @@ describe('Given a DebtList component', () => {
       component.toggleMode('creditor');
 
       const result = await firstValueFrom(component.filteredDebts$);
-      result.unpaid.forEach((debt) => {
+
+      const allCreditorDebts = [...result.unpaid, ...result.paid, ...result.overdue];
+
+      allCreditorDebts.forEach((debt) => {
         const creditorId = typeof debt.creditor === 'object' ? debt.creditor._id : debt.creditor;
 
-        expect(creditorId).toBe(currentUserId);
+        expect(creditorId).toBe(currentUserMock._id);
       });
     });
 
@@ -133,11 +144,36 @@ describe('Given a DebtList component', () => {
       component.toggleMode('debtor');
 
       const result = await firstValueFrom(component.filteredDebts$);
-      result.unpaid.forEach((debt) => {
+
+      const allDebtorDebts = [...result.unpaid, ...result.paid, ...result.overdue];
+
+      allDebtorDebts.forEach((debt) => {
         const debtorId = typeof debt.debtor === 'object' ? debt.debtor._id : debt.debtor;
 
-        expect(debtorId).toBe(currentUserId);
+        expect(debtorId).toBe(currentUserMock._id);
       });
+    });
+  });
+
+  describe('When user is not authenticated', () => {
+    it('Should return empty debt columns', async () => {
+      authServiceMock.currentUser.set(null);
+      fixture.detectChanges();
+
+      const result = await firstValueFrom(component.filteredDebts$);
+
+      expect(result.unpaid.length).toBe(0);
+      expect(result.paid.length).toBe(0);
+      expect(result.overdue.length).toBe(0);
+    });
+
+    it('Should return empty debtors list', async () => {
+      authServiceMock.currentUser.set(null);
+      fixture.detectChanges();
+
+      const debtors = await firstValueFrom(component.debtors$);
+
+      expect(debtors.length).toBe(0);
     });
   });
 });
