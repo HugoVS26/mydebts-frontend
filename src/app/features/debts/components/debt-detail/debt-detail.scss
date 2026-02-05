@@ -139,9 +139,7 @@ $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
   }
 
   &__counterparty {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    text-transform: capitalize;
 
     &-name {
       font-weight: 500;

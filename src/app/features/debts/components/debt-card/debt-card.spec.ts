@@ -1,10 +1,15 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { DebtCard } from './debt-card';
-import { debtMock } from '../../mocks/debtsMock';
 import { Router } from '@angular/router';
 import { provideRouter } from '@angular/router';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+
+import { DebtCard } from './debt-card';
+import { debtMock } from '../../mocks/debtsMock';
+
+registerLocaleData(localeEs);
 
 describe('Given a DebtCardComponent', () => {
   let fixture: ComponentFixture<DebtCard>;
@@ -48,9 +53,11 @@ describe('Given a DebtCardComponent', () => {
       const counterpartyName =
         typeof debtMock.debtor === 'object' ? debtMock.debtor.displayName : debtMock.debtor;
 
+      const formattedAmount = debtMock.amount.toFixed(2).replace('.', ',');
+
       expect(debtTitle).toContain(debtMock.description);
       expect(debtData).toContain(counterpartyName);
-      expect(debtData).toContain(debtMock.amount);
+      expect(debtData).toContain(formattedAmount);
       expect(debtStatus).toContain(debtMock.status);
     });
 
@@ -93,7 +100,7 @@ describe('Given a DebtCardComponent', () => {
   });
 
   describe('When card is clicked', () => {
-    it('Then it should navigate to debt detail page with the correct debt id', () => {
+    it('Then it should navigate to debt detail page with the correct debt _id', () => {
       const navigateSpy = vi.spyOn(router, 'navigate');
       component.debt = { ...debtMock, _id: '456' };
 

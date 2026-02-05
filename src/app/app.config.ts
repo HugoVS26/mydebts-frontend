@@ -3,9 +3,13 @@ import { provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } fr
 import { PreloadAllModules, provideRouter, withPreloading } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './features/auth/interceptors/auth.interceptor';
+
+registerLocaleData(localeEs);
 
 export const appConfig: ApplicationConfig = {
   providers: [

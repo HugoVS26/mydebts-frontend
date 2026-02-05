@@ -20,6 +20,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 
 import type { IDebt, IDebtCreate, IDebtUpdate } from '../../types/debt';
+import { AuthService } from 'src/app/features/auth/services/auth';
 
 interface DebtFormValues {
   counterparty: string;
@@ -60,6 +61,7 @@ export class DebtForm implements OnInit, OnChanges {
   formReady = signal(false);
 
   private formBuilder = inject(FormBuilder);
+  private authService = inject(AuthService);
   private initialFormValues: Partial<DebtFormValues> = {};
 
   constructor() {
@@ -178,11 +180,15 @@ export class DebtForm implements OnInit, OnChanges {
   onSubmit(): void {
     if (this.form.invalid) return;
 
+    const currentUserId = this.authService.currentUserId;
+    if (!currentUserId) {
+      console.error('User not authenticated');
+      return;
+    }
+
     const { counterparty, description, amount, debtDate, dueDate } = this.form.value;
 
     if (this.mode === 'create') {
-      const currentUserId = '68adda76e019d1a45a6ae1fe';
-
       const payload: IDebtCreate =
         this.debtMode() === 'creditor'
           ? {

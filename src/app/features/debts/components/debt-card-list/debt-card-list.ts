@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { BehaviorSubject, combineLatest, map, shareReplay, tap } from 'rxjs';
 import type { Observable } from 'rxjs';
@@ -9,6 +9,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 import { DebtCard } from '../debt-card/debt-card';
 import { DebtsService } from '../../services/debts';
+import { AuthService } from '../../../auth/services/auth';
 import type { IDebt } from '../../types/debt';
 
 export interface DebtColumns {
@@ -43,7 +44,10 @@ const SORT_OPTIONS = [
 })
 export class DebtCardList {
   private debtsService = inject(DebtsService);
+  private authService = inject(AuthService);
   private breakpointObserver = inject(BreakpointObserver);
+
+  private currentUserId = computed(() => this.authService.currentUser()?._id ?? null);
 
   isDesktop$: Observable<boolean> = this.breakpointObserver
     .observe([Breakpoints.Medium, Breakpoints.Large, Breakpoints.XLarge])
@@ -127,25 +131,26 @@ export class DebtCardList {
 
   debtors$: Observable<DebtorOption[]> = combineLatest([this.debtsRaw$, this.mode$]).pipe(
     map(([debts, mode]) => {
+      const currentUserId = this.currentUserId();
+      if (!currentUserId) return [];
+
       const mapById = new Map<string, DebtorOption>();
-      const currentUserId = '68adda76e019d1a45a6ae1fe';
 
       for (const debt of debts) {
         const otherUser = mode === 'creditor' ? debt.debtor : debt.creditor;
 
         if (otherUser === currentUserId || !otherUser) continue;
 
-        const id = typeof otherUser === 'string' ? otherUser : (otherUser._id ?? 'unknown');
+        const _id = typeof otherUser === 'string' ? otherUser : (otherUser._id ?? 'unknown');
         const name =
           typeof otherUser === 'string' ? otherUser : (otherUser.displayName ?? 'Unnamed');
 
-        if (!mapById.has(id)) mapById.set(id, { _id: id, name });
+        if (!mapById.has(_id)) mapById.set(_id, { _id: _id, name });
       }
 
       return Array.from(mapById.values());
     }),
     tap((list) => (this._lastDebtorsSnapshot = list)),
-    shareReplay({ refCount: true }),
   );
 
   /** First selected debtor name (for mat-select-trigger) */
@@ -163,7 +168,10 @@ export class DebtCardList {
     this.debtorSelection$,
   ]).pipe(
     map(([debts, sort, mode, selectedDebtors]) => {
-      const currentUserId = '68adda76e019d1a45a6ae1fe';
+      const currentUserId = this.currentUserId();
+      if (!currentUserId) {
+        return { unpaid: [], paid: [], overdue: [] };
+      }
 
       const filtered = debts.filter((debt) => {
         const otherUser = mode === 'creditor' ? debt.debtor : debt.creditor;
@@ -173,9 +181,7 @@ export class DebtCardList {
         const matchesSelection =
           selectedDebtors.length === 0 || selectedDebtors.includes(otherUserId);
 
-        const isNotCurrentUser =
-          (typeof otherUser === 'string' && otherUser !== currentUserId) ||
-          (typeof otherUser === 'object' && otherUser._id !== currentUserId);
+        const isNotCurrentUser = otherUserId !== currentUserId;
 
         const involvesCurrentUser =
           mode === 'creditor'
