@@ -1,4 +1,4 @@
-import type { User } from '../../users/model/user.model';
+import type { User } from '../../auth/types/user';
 
 export interface IDebt {
   _id: string;

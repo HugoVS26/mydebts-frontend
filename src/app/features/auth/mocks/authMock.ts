@@ -10,7 +10,7 @@ export const registerRequestMock: RegisterRequest = {
 export const authResponseMock: AuthResponse = {
   token: 'mock-jwt-token',
   user: {
-    id: '123',
+    _id: '123',
     firstName: 'Jose',
     lastName: 'García',
     displayName: 'José García',
