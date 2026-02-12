@@ -1,0 +1,121 @@
+@use '@angular/material' as mat;
+
+.public-navbar {
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  width: 100%;
+
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 1200px;
+    max-width: 90%;
+    position: relative;
+
+    @media (max-width: 1024px) {
+      width: 100%;
+      max-width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  &__link {
+    font-size: 22px;
+    font-weight: 600;
+    text-decoration: none;
+
+    @media (max-width: 1024px) {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+
+    @media (max-width: 1024px) {
+      order: 3;
+    }
+  }
+
+  &__button {
+    font-size: 14px;
+
+    @media (max-width: 768px) {
+      height: 32px;
+      width: 32px;
+    }
+  }
+
+  &__menu-button {
+    display: none;
+
+    @media (max-width: 1024px) {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding-left: 0;
+      order: 1;
+    }
+  }
+
+  &__menu-theme-toggle {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  &__theme-toggle {
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: fixed;
+    top: 12px;
+    right: 20px;
+
+    &--desktop {
+      @media (max-width: 1024px) {
+        display: none;
+      }
+    }
+  }
+
+  :host-context(.light-theme) &__theme-toggle svg {
+    fill: #353025;
+  }
+
+  :host-context(.dark-theme) &__theme-toggle svg {
+    fill: #f1c02b;
+  }
+
+  .hamburger-inner,
+  .hamburger-inner::before,
+  .hamburger-inner::after {
+    background-color: var(--mat-sys-on-surface);
+  }
+
+  .hamburger:hover:not(.is-active) {
+    .hamburger-inner,
+    .hamburger-inner::before,
+    .hamburger-inner::after {
+      background-color: #f1c02b;
+    }
+  }
+}
+
+.hamburger-box span {
+  transform: scale(0.8);
+}

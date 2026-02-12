@@ -1,0 +1,29 @@
+@mixin page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 2rem;
+
+  @media (max-width: 768px) {
+    padding-top: 1rem;
+  }
+}
+
+@mixin page-container-narrow {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-top: 0 2rem;
+
+  @media (max-width: 768px) {
+    padding-top: 1rem;
+  }
+}
+
+@mixin page-container-wide {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-top: 2rem;
+
+  @media (max-width: 768px) {
+    padding-top: 1rem;
+  }
+}
