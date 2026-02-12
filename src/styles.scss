@@ -3,10 +3,36 @@
 @use './app/styles/themes/_light-theme' as light-theme;
 @use './app/styles/themes/_dark-theme' as dark-theme;
 @use './app/styles/themes/_brand-palette' as bp;
+@use './app/styles/mixins' as mix;
+@use './app/styles/variables' as vars;
 
 :root {
-  --mat-toolbar-standard-height: 64px;
-  --mat-toolbar-mobile-height: 56px;
+  --mat-toolbar-standard-height: #{vars.$toolbar-standard-height};
+  --mat-toolbar-mobile-height: #{vars.$toolbar-mobile-height};
+  --max-width-default: $max-width-default;
+  --max-width-narrow: $max-width-narrow;
+  --max-width-wide: $max-width-wide;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul,
+ol,
+li {
+  text-decoration: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 html {
@@ -53,13 +79,6 @@ html.dark-theme {
   );
 }
 
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
 body {
   color-scheme: light dark;
   background-color: var(--mat-sys-surface);
@@ -74,22 +93,8 @@ body {
   margin: 0 auto;
 }
 
-@media (max-width: 599px) {
+@media (max-width: 768px) {
   body {
     padding-top: var(--mat-toolbar-mobile-height);
   }
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-ul,
-ol,
-li {
-  text-decoration: none;
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
