@@ -1,0 +1,184 @@
+@use '../../styles/mixins' as mix;
+
+.home {
+  @include mix.page-container;
+}
+
+.home__main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  min-height: var(--page-min-height);
+  margin: 0 1rem;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: center;
+    justify-items: center;
+    text-align: center;
+
+    & div {
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+    }
+  }
+}
+
+.home__title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.split-text__container {
+  display: inline-flex;
+  position: relative;
+  gap: 0;
+  perspective: 1000px;
+}
+
+.text-part {
+  display: inline-block;
+  position: relative;
+  animation-duration: 0.8s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+.text-part--right {
+  opacity: 0;
+  transform-origin: top;
+  animation-name: flip-in-x;
+  animation-delay: 0.3s;
+}
+
+@keyframes flip-in-x {
+  0% {
+    opacity: 0;
+    transform: rotateX(90deg);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0deg);
+  }
+}
+
+.home__subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+
+  @media (max-width: 769px) {
+    font-size: 1.2rem;
+  }
+}
+
+.home__cta {
+  display: flex;
+  gap: 1rem;
+}
+
+.home__debts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  align-items: start;
+  padding: 2rem 0;
+  max-width: 1000px;
+  margin: 0 auto;
+
+  .debt-card {
+    pointer-events: none;
+    cursor: default;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  .debt-card:nth-child(1) {
+    margin-top: 0;
+
+    @media (max-width: 768px) {
+      margin-left: 2rem;
+    }
+  }
+
+  .debt-card:nth-child(2) {
+    margin-top: 4rem;
+
+    @media (max-width: 768px) {
+      margin-right: 2rem;
+    }
+  }
+
+  .debt-card:nth-child(3) {
+    margin-top: 8rem;
+
+    @media (max-width: 768px) {
+      margin-left: 2rem;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+
+    .debt-card:nth-child(1),
+    .debt-card:nth-child(2),
+    .debt-card:nth-child(3) {
+      margin-top: 0;
+    }
+  }
+}
+
+.home__features {
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.home__features h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.home__features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  &__icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
+}

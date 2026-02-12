@@ -2,14 +2,14 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Router } from '@angular/router';
 import type { HttpErrorResponse } from '@angular/common/http';
 
-import { Navbar } from 'src/app/shared/components/navbar/navbar';
+import { PublicNavbar } from 'src/app/shared/components/public-navbar/public-navbar';
 import { LoginForm } from 'src/app/features/auth/components/login-form/login-form';
 import { AuthService } from 'src/app/features/auth/services/auth';
 import type { LoginRequest } from 'src/app/features/auth/types/auth';
 
 @Component({
   selector: 'app-login-page',
-  imports: [LoginForm, Navbar],
+  imports: [LoginForm, PublicNavbar],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

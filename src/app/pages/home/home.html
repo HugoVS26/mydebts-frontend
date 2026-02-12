@@ -1,0 +1,66 @@
+<app-public-navbar></app-public-navbar>
+<div class="home">
+  <section class="home__main">
+    <div>
+      <h1 class="home__title">
+        Track Your Debts,
+        <div class="split-text__container">
+          <span class="text-part text-part--left">Effort</span>
+          <span class="text-part text-part--right">lessly</span>
+        </div>
+      </h1>
+      <p class="home__subtitle">
+        Manage who owes you and who you owe. <br> Simple, clear, and always up to date.
+      </p>
+      <div class="home__cta">
+        <button matButton="filled" color="primary" [routerLink]="['/register']">
+          Get Started
+        </button>
+      </div>
+    </div>
+    <div class="home__debts-grid">
+
+      <app-debt-card class="debt-card debt-card__status--unpaid" [debt]="exampleDebts.unpaid" [mode]="'debtor'" />
+
+      <app-debt-card class="debt-card debt-card__status--paid" [debt]="exampleDebts.overdue" [mode]="'debtor'" />
+
+      <app-debt-card class="debt-card debt-card__status--overdue" [debt]="exampleDebts.paid" [mode]="'creditor'" />
+
+    </div>
+  </section>
+
+  <section class="home__features">
+    <h2>Why MyDebts?</h2>
+    <div class="home__features-grid">
+      <mat-card class="home__features-grid__item">
+        <mat-card-header class="home__features-grid__header">
+          <mat-icon class="home__features-grid__icon" color="primary">people</mat-icon>
+          <mat-card-title>Track Everyone</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          Know exactly who owes you money and who you owe.
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="home__features-grid__item">
+        <mat-card-header class="home__features-grid__header">
+          <mat-icon class="home__features-grid__icon" color="primary">notifications</mat-icon>
+          <mat-card-title>Never Forget</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          Set due dates and get reminders for overdue debts.
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="home__features-grid__item">
+        <mat-card-header class="home__features-grid__header">
+          <mat-icon class="home__features-grid__icon" color="primary">check</mat-icon>
+          <mat-card-title>Mark as Paid</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          Easily track when debts are settled.
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+</div>
