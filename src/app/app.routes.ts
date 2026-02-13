@@ -5,14 +5,23 @@ import { DebtDetailPage } from './pages/debt-detail/debt-detail';
 import { RegisterPage } from './pages/register/register';
 import { LoginPage } from './pages/login/login';
 import { HomePage } from './pages/home/home';
+import { authGuard } from './core/guards/auth/auth.guard';
+import { guestGuard } from './core/guards/guest/guest.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomePage },
-  { path: 'home', component: HomePage },
-  { path: 'debts', component: DebtListPage },
-  { path: 'debts/new', component: DebtFormPage },
-  { path: 'debts/:debtId/edit', component: DebtFormPage },
-  { path: 'debts/:debtId', component: DebtDetailPage },
-  { path: 'register', component: RegisterPage },
-  { path: 'login', component: LoginPage },
+  { path: '', component: HomePage, canActivate: [guestGuard] },
+  { path: 'home', component: HomePage, canActivate: [guestGuard] },
+  { path: 'register', component: RegisterPage, canActivate: [guestGuard] },
+  { path: 'login', component: LoginPage, canActivate: [guestGuard] },
+
+  {
+    path: 'debts',
+    canActivate: [authGuard],
+    children: [
+      { path: '', component: DebtListPage },
+      { path: 'new', component: DebtFormPage },
+      { path: ':debtId/edit', component: DebtFormPage },
+      { path: ':debtId', component: DebtDetailPage },
+    ],
+  },
 ];
