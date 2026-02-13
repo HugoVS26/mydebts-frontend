@@ -6,6 +6,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 
+import { AuthService } from 'src/app/features/auth/services/auth';
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -16,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class Navbar implements OnInit {
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   isLightMode = signal(true);
   isMenuOpen = signal(false);
@@ -51,5 +54,9 @@ export class Navbar implements OnInit {
 
   closeMenu(): void {
     this.isMenuOpen.set(false);
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }

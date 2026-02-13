@@ -8,6 +8,11 @@
   z-index: 100;
   width: 100%;
 
+  @media (max-width: 1024px) {
+    justify-content: center;
+    justify-items: center;
+  }
+
   &__container {
     display: flex;
     justify-content: space-between;
@@ -68,6 +73,17 @@
     stroke: #1f1b12;
   }
 
+  &__button--logout {
+    background-color: transparent;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  &__icon--logout {
+    color: var(--mat-sys-inverse-surface);
+  }
+
   &__menu-button {
     display: none;
 
@@ -85,27 +101,23 @@
     animation: none !important;
   }
 
-  &__theme-toggle {
+  &__actions--extra {
     border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    background-color: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     position: fixed;
-    top: 12px;
+    top: 16px;
     right: 20px;
+    gap: 0.5rem;
 
-    @media (min-width: 1024px) and (max-width: 1350px) {
-      position: static;
+    @media (max-width: 1024px) {
+      display: none;
     }
 
-    &--desktop {
-      @media (max-width: 1024px) {
-        display: none;
-      }
+    @media (min-width: 1024px) and (max-width: 1400px) {
+      position: static;
     }
   }
 
@@ -115,6 +127,10 @@
 
   :host-context(.dark-theme) &__theme-toggle svg {
     fill: #f1c02b;
+  }
+
+  .mat-mdc-menu-trigger {
+    padding: 0 !important;
   }
 
   .hamburger-inner,
