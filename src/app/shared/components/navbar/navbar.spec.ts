@@ -1,24 +1,31 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
-
-import { Navbar } from './navbar';
 import { provideRouter } from '@angular/router';
 import { provideZonelessChangeDetection } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { Navbar } from './navbar';
 
-describe('Navbar', () => {
+describe('Given a Navbar component', () => {
   let component: Navbar;
   let fixture: ComponentFixture<Navbar>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Navbar],
-      providers: [provideRouter([]), provideZonelessChangeDetection()],
+      providers: [
+        provideRouter([]),
+        provideZonelessChangeDetection(),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Navbar);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
   describe('When component is initialized', () => {
     it('Should create', () => {
       expect(component).toBeTruthy();
@@ -45,30 +52,42 @@ describe('Navbar', () => {
   describe('When toggling theme', () => {
     it('Then it should switch from light to dark mode', () => {
       component.isLightMode.set(true);
+      document.documentElement.classList.add('light-theme');
 
       component.toggleTheme();
 
       expect(component.isLightMode()).toBe(false);
       expect(document.documentElement.classList.contains('dark-theme')).toBe(true);
       expect(document.documentElement.classList.contains('light-theme')).toBe(false);
+
+      // Cleanup
+      document.documentElement.classList.remove('dark-theme');
     });
 
     it('Then it should switch from dark to light mode', () => {
       component.isLightMode.set(false);
+      document.documentElement.classList.add('dark-theme');
 
       component.toggleTheme();
 
       expect(component.isLightMode()).toBe(true);
       expect(document.documentElement.classList.contains('light-theme')).toBe(true);
       expect(document.documentElement.classList.contains('dark-theme')).toBe(false);
+
+      // Cleanup
+      document.documentElement.classList.remove('light-theme');
     });
 
     it('Then it should update document classes correctly', () => {
       component.isLightMode.set(true);
+      document.documentElement.classList.add('light-theme');
 
       component.toggleTheme();
 
       expect(document.documentElement.classList.contains('dark-theme')).toBe(true);
+
+      // Cleanup
+      document.documentElement.classList.remove('dark-theme');
     });
   });
 
