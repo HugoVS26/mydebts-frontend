@@ -8,7 +8,7 @@ import { HomePage } from './pages/home/home';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
-  { path: '/home', component: HomePage },
+  { path: 'home', component: HomePage },
   { path: 'debts', component: DebtListPage },
   { path: 'debts/new', component: DebtFormPage },
   { path: 'debts/:debtId/edit', component: DebtFormPage },
