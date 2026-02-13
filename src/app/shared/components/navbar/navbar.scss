@@ -13,8 +13,10 @@
     justify-content: space-between;
     align-items: center;
     width: 1200px;
-    max-width: 90%;
+    max-width: 100%;
     position: relative;
+    box-sizing: border-box;
+    gap: 1rem;
 
     @media (max-width: 1024px) {
       width: 100%;
@@ -38,6 +40,7 @@
   &__actions {
     display: flex;
     align-items: center;
+    gap: 1rem;
 
     @media (max-width: 1024px) {
       order: 3;
@@ -94,6 +97,10 @@
     position: fixed;
     top: 12px;
     right: 20px;
+
+    @media (min-width: 1024px) and (max-width: 1350px) {
+      position: static;
+    }
 
     &--desktop {
       @media (max-width: 1024px) {
