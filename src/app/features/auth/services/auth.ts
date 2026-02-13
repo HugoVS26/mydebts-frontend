@@ -2,6 +2,8 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import type { Observable } from 'rxjs';
 import { tap, of } from 'rxjs';
+import { Router } from '@angular/router';
+
 import { environment } from 'src/environments/environment';
 import type { LoginRequest, RegisterRequest, AuthResponse } from '../types/auth';
 import type { User } from '../types/user';
@@ -9,6 +11,7 @@ import type { User } from '../types/user';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
+  private router = inject(Router);
   private apiUrl = `${environment.apiUrl}/auth`;
 
   private currentUserSignal = signal<User | null>(null);
@@ -39,6 +42,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     this.currentUserSignal.set(null);
+    this.router.navigate(['/']);
   }
 
   getToken(): string | null {
