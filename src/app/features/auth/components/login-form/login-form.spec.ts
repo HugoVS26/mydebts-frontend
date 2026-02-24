@@ -1,6 +1,8 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+
 import { LoginForm } from './login-form';
 import type { LoginRequest } from '../../types/auth';
 
@@ -11,7 +13,7 @@ describe('Given a LoginForm component', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LoginForm],
-      providers: [provideZonelessChangeDetection()],
+      providers: [provideZonelessChangeDetection(), provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginForm);

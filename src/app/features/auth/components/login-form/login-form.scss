@@ -89,4 +89,27 @@
       color: #c62828;
     }
   }
+
+  &__forgot {
+    text-align: right;
+    margin-top: -1rem;
+  }
+
+  &__forgot-link {
+    color: var(--mat-sys-primary);
+    font-size: 0.85rem;
+    font-weight: 550;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--mat-sys-primary);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
 }
