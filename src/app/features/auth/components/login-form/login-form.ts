@@ -7,6 +7,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 
 import type { LoginRequest } from '../../types/auth';
 
@@ -20,6 +21,7 @@ import type { LoginRequest } from '../../types/auth';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    RouterLink,
   ],
   templateUrl: './login-form.html',
   styleUrls: ['./login-form.scss'],
