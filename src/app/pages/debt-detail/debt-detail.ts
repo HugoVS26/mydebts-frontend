@@ -9,6 +9,7 @@ import type { IDebt } from 'src/app/features/debts/types/debt';
 
 @Component({
   selector: 'app-debt-detail-page',
+  standalone: true,
   imports: [DebtDetail, Navbar],
   templateUrl: './debt-detail.html',
   styleUrl: './debt-detail.scss',
