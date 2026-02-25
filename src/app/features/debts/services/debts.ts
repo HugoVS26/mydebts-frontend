@@ -50,4 +50,10 @@ export class DebtsService {
   markDebtAsPaid(debtId: string): Observable<SingleDebtResponse> {
     return this.http.patch<SingleDebtResponse>(`${this.apiUrl}/${debtId}/paid`, {});
   }
+
+  deleteAllPaidDebts(mode: 'creditor' | 'debtor'): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/paid`, {
+      params: { mode },
+    });
+  }
 }

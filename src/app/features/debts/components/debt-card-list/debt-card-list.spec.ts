@@ -3,7 +3,9 @@ import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import type { Observable } from 'rxjs';
 import { firstValueFrom, of, take } from 'rxjs';
+import type { MatDialog } from '@angular/material/dialog';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 
@@ -20,12 +22,16 @@ registerLocaleData(localeEs);
 describe('Given a DebtList component', () => {
   let fixture: ComponentFixture<DebtCardList>;
   let component: DebtCardList;
-  let debtsServiceMock: { getDebts: ReturnType<typeof vi.fn> };
+  let debtsServiceMock: {
+    getDebts: ReturnType<typeof vi.fn>;
+    deleteAllPaidDebts: ReturnType<typeof vi.fn>;
+  };
   let authServiceMock: { currentUser: ReturnType<typeof signal<User | null>> };
 
   beforeEach(async () => {
     debtsServiceMock = {
       getDebts: vi.fn().mockReturnValue(of({ debts: debtsMock })),
+      deleteAllPaidDebts: vi.fn().mockReturnValue(of({ message: 'deleted' })),
     };
 
     authServiceMock = {
@@ -174,6 +180,56 @@ describe('Given a DebtList component', () => {
       const debtors = await firstValueFrom(component.debtors$);
 
       expect(debtors.length).toBe(0);
+    });
+  });
+
+  describe('When onDeleteAllPaid is called', () => {
+    let dialog: { open: ReturnType<typeof vi.fn> };
+
+    beforeEach(() => {
+      dialog = { open: vi.fn() };
+      component['dialog'] = dialog as unknown as MatDialog;
+    });
+
+    it('Should open confirm dialog', () => {
+      const mockDialogRef = { afterClosed: (): Observable<boolean> => of(false) };
+      dialog.open.mockReturnValue(mockDialogRef);
+
+      component.onDeleteAllPaid();
+
+      expect(dialog.open).toHaveBeenCalled();
+    });
+
+    it('Should call deleteAllPaidDebts with current mode when confirmed', () => {
+      const mockDialogRef = { afterClosed: (): Observable<boolean> => of(true) };
+      dialog.open.mockReturnValue(mockDialogRef);
+
+      debtsServiceMock['deleteAllPaidDebts'] = vi.fn().mockReturnValue(of({ message: 'deleted' }));
+      component.onDeleteAllPaid();
+
+      expect(debtsServiceMock['deleteAllPaidDebts']).toHaveBeenCalledWith(component.mode);
+    });
+
+    it('Should not call deleteAllPaidDebts when cancelled', () => {
+      const mockDialogRef = { afterClosed: (): Observable<boolean> => of(false) };
+      dialog.open.mockReturnValue(mockDialogRef);
+
+      debtsServiceMock['deleteAllPaidDebts'] = vi.fn().mockReturnValue(of({ message: 'deleted' }));
+      component.onDeleteAllPaid();
+
+      expect(debtsServiceMock['deleteAllPaidDebts']).not.toHaveBeenCalled();
+    });
+
+    it('Should call deleteAllPaidDebts with debtor mode when in debtor mode', () => {
+      component.toggleMode('debtor');
+
+      const mockDialogRef = { afterClosed: (): Observable<boolean> => of(true) };
+      dialog.open.mockReturnValue(mockDialogRef);
+
+      debtsServiceMock['deleteAllPaidDebts'] = vi.fn().mockReturnValue(of({ message: 'deleted' }));
+      component.onDeleteAllPaid();
+
+      expect(debtsServiceMock['deleteAllPaidDebts']).toHaveBeenCalledWith('debtor');
     });
   });
 });

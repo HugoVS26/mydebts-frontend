@@ -77,13 +77,28 @@
     gap: 1rem;
     width: 100%;
     max-width: 300px;
+  }
 
-    &-title {
-      margin-bottom: 0.5rem;
-      font-size: 1.25rem;
-      text-align: center;
-      text-transform: uppercase;
+  &__column-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    button {
+      position: absolute;
+      right: 0;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
     }
+  }
+
+  &__column-title {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    text-align: center;
+    text-transform: uppercase;
   }
 
   &__cards {
@@ -116,5 +131,9 @@
       align-self: stretch;
       margin: 0 1.75rem;
     }
+  }
+
+  &__empty {
+    text-align: center;
   }
 }
