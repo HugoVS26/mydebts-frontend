@@ -8,6 +8,7 @@ import { HomePage } from './pages/home/home';
 import { ForgotPasswordPage } from './pages/forgot-password/forgot-password';
 import { authGuard } from './core/guards/auth/auth.guard';
 import { guestGuard } from './core/guards/guest/guest.guard';
+import { ResetPasswordPage } from './pages/reset-password/reset-password';
 
 export const routes: Routes = [
   { path: '', component: HomePage, canActivate: [guestGuard] },
@@ -15,6 +16,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterPage, canActivate: [guestGuard] },
   { path: 'login', component: LoginPage, canActivate: [guestGuard] },
   { path: 'forgot-password', component: ForgotPasswordPage, canActivate: [guestGuard] },
+  { path: 'reset-password', component: ResetPasswordPage, canActivate: [guestGuard] },
 
   {
     path: 'debts',
