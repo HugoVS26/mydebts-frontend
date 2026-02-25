@@ -47,7 +47,7 @@
       <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
       } @empty {
       <li class="debt-list__card-item debt-list__empty">
-        You have no unpaid debts. Enjoy your day! 🎉
+        You have no unpaid debts. <br> Enjoy your day! 🎉
       </li>
       }
     </ol>
@@ -62,7 +62,7 @@
       <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
       } @empty {
       <li class="debt-list__card-item debt-list__empty">
-        No overdue debts. Good job staying on top of things! 💪
+        No overdue debts. <br> Good job staying on top of things! 💪
       </li>
       }
     </ol>
@@ -71,16 +71,23 @@
   <mat-divider class="debt-list__divider" [vertical]="isDesktop$ | async"></mat-divider>
 
   <div class="debt-list__column">
-    <h3 class="debt-list__column-title">Paid</h3>
+    <div class="debt-list__column-header">
+      <h3 class="debt-list__column-title">Paid</h3>
+      @if ((filteredDebts$ | async)?.['paid']?.length) {
+      <button mat-icon-button (click)="onDeleteAllPaid()" title="Delete all paid debts"
+        aria-label="Delete all paid debts">
+        <mat-icon>delete_sweep</mat-icon>
+      </button>
+      }
+    </div>
     <ol class="debt-list__cards">
       @for (debt of (filteredDebts$ | async)?.['paid']; track trackByDebtId($index, debt)) {
       <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
       } @empty {
       <li class="debt-list__card-item debt-list__empty">
-        No paid debts found. Looks like you’re all caught up! ✅
+        No paid debts found. <br> Looks like you’re all caught up! ✅
       </li>
       }
     </ol>
   </div>
-
 </div>

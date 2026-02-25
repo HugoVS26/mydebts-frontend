@@ -6,12 +6,14 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 
+import type { IDebt } from '../../types/debt';
 import { DebtCard } from '../debt-card/debt-card';
 import { DebtsService } from '../../services/debts';
 import { AuthService } from '../../../auth/services/auth';
-import type { IDebt } from '../../types/debt';
-
+import { ConfirmDialog } from 'src/app/shared/components/confirm-dialog/confirm-dialog/confirm-dialog';
 export interface DebtColumns {
   unpaid: IDebt[];
   paid: IDebt[];
@@ -37,7 +39,7 @@ const SORT_OPTIONS = [
 @Component({
   selector: 'app-debt-card-list',
   standalone: true,
-  imports: [DebtCard, AsyncPipe, MatButtonToggleModule, MatDividerModule, MatSelectModule],
+  imports: [DebtCard, AsyncPipe, MatButtonToggleModule, MatIcon, MatDividerModule, MatSelectModule],
   templateUrl: './debt-card-list.html',
   styleUrls: ['./debt-card-list.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,6 +48,7 @@ export class DebtCardList {
   private debtsService = inject(DebtsService);
   private authService = inject(AuthService);
   private breakpointObserver = inject(BreakpointObserver);
+  private dialog = inject(MatDialog);
 
   private currentUserId = computed(() => this.authService.currentUser()?._id ?? null);
 
@@ -208,6 +211,26 @@ export class DebtCardList {
       };
     }),
   );
+
+  onDeleteAllPaid(): void {
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'Clear Paid Debts',
+        message: `Are you sure you want to delete all paid debts where you are ${this.mode}?`,
+        confirmText: 'Delete All',
+        cancelText: 'Cancel',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.debtsService.deleteAllPaidDebts(this.mode).subscribe({
+          next: () => window.location.reload(),
+          error: (error) => console.error('Error deleting paid debts:', error),
+        });
+      }
+    });
+  }
 
   /** Helpers */
   trackByDebtId(index: number, debt: IDebt): string {
