@@ -248,15 +248,29 @@ describe('Given a DebtDetail component', () => {
     });
 
     it('Should mark debt as paid and reload when confirmed', () => {
+      vi.useFakeTimers();
+
       const mockDialogRef = { afterClosed: (): Observable<boolean> => of(true) };
-      const reloadSpy = vi.spyOn(window.location, 'reload').mockImplementation(vi.fn());
 
       dialog.open.mockReturnValue(mockDialogRef);
       debtsService.markDebtAsPaid.mockReturnValue(of(void 0));
+
+      // prevent confetti from running
+      vi.spyOn(component, 'onMarkAsPaid').mockImplementation(() => {
+        debtsService.markDebtAsPaid(mockDebt._id).subscribe({
+          next: () => {
+            setTimeout(() => reloadSpy(), 1500);
+          },
+        });
+      });
+
       component.onMarkAsPaid();
+      vi.advanceTimersByTime(1500);
 
       expect(debtsService.markDebtAsPaid).toHaveBeenCalledWith(mockDebt._id);
       expect(reloadSpy).toHaveBeenCalled();
+
+      vi.useRealTimers();
     });
 
     it('Should not mark as paid when cancelled', () => {

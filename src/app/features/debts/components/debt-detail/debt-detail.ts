@@ -8,6 +8,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import confetti from 'canvas-confetti';
 
 import { DebtsService } from '../../services/debts';
 import { AuthService } from 'src/app/features/auth/services/auth';
@@ -136,7 +137,13 @@ export class DebtDetail {
       if (confirmed) {
         this.debtsService.markDebtAsPaid(this.debt._id).subscribe({
           next: () => {
-            window.location.reload();
+            confetti({
+              particleCount: 100,
+              angle: -90,
+              spread: 70,
+              origin: { y: 0 },
+            });
+            setTimeout(() => window.location.reload(), 1500);
           },
           error: (error) => {
             console.error('Error marking debt as paid:', error);
