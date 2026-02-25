@@ -27,7 +27,7 @@ $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
   &::before {
     content: '';
     position: absolute;
-    bottom: -2em;
+    bottom: -2.2em;
     right: 0;
     border-width: 2rem 2rem 0 0;
     border-style: solid;
