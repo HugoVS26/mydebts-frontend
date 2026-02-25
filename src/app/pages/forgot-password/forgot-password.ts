@@ -46,4 +46,9 @@ export class ForgotPasswordPage {
   onNavigateToLogin(): void {
     this.router.navigate(['/login']);
   }
+
+  onTryAgain(): void {
+    this.submitted.set(false);
+    this.errorMessage.set(null);
+  }
 }
