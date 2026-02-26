@@ -69,8 +69,11 @@ export class AuthService {
     );
   }
 
-  forgotPassword(email: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/forgot-password`, { email });
+  forgotPassword(email: string, turnstileToken: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/forgot-password`, {
+      email,
+      turnstileToken,
+    });
   }
 
   resetPassword(token: string, newPassword: string): Observable<{ message: string }> {

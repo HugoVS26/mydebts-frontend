@@ -3,11 +3,13 @@ export interface RegisterRequest {
   lastName: string;
   email: string;
   password: string;
+  turnstileToken: string;
 }
 
 export interface LoginRequest {
   email: string;
   password: string;
+  turnstileToken: string;
 }
 
 export interface AuthResponse {
@@ -20,4 +22,9 @@ export interface AuthResponse {
     email: string;
     role: string;
   };
+}
+
+export interface ForgotPasswordSubmit {
+  email: string;
+  turnstileToken: string;
 }

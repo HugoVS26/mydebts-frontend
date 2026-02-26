@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { ForgotPasswordForm } from './forgot-password-form';
+import type { ForgotPasswordSubmit } from '../../types/auth';
 
 describe('Given a ForgotPasswordForm component', () => {
   let component: ForgotPasswordForm;
@@ -60,6 +61,10 @@ describe('Given a ForgotPasswordForm component', () => {
   });
 
   describe('When submitting the form', () => {
+    beforeEach(() => {
+      component.turnstileToken.set('mock-turnstile-token');
+    });
+
     it('Should not emit when form is invalid', () => {
       let emitted = false;
       component.submitForm.subscribe(() => (emitted = true));
@@ -69,16 +74,31 @@ describe('Given a ForgotPasswordForm component', () => {
       expect(emitted).toBeFalsy();
     });
 
-    it('Should emit the email when form is valid', () => {
-      const expectedEmail = 'hugo@example.com';
-      component.email.setValue(expectedEmail);
+    it('Should not emit when turnstile token is missing', () => {
+      component.turnstileToken.set(null);
+      component.email.setValue('hugo@example.com');
 
-      let emittedEmail: string | undefined;
-      component.submitForm.subscribe((email) => (emittedEmail = email));
+      let emitted = false;
+      component.submitForm.subscribe(() => (emitted = true));
 
       component.onSubmit();
 
-      expect(emittedEmail).toBe(expectedEmail);
+      expect(emitted).toBeFalsy();
+    });
+
+    it('Should emit email and turnstile token when form is valid', () => {
+      const expectedEmail = 'hugo@example.com';
+      component.email.setValue(expectedEmail);
+
+      let emittedData: ForgotPasswordSubmit | undefined;
+      component.submitForm.subscribe((data) => (emittedData = data));
+
+      component.onSubmit();
+
+      expect(emittedData).toEqual({
+        email: expectedEmail,
+        turnstileToken: 'mock-turnstile-token',
+      });
     });
 
     it('Should not emit when email is invalid format', () => {
