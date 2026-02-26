@@ -8,7 +8,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
+import { NgxTurnstileModule } from 'ngx-turnstile';
 
+import { environment } from 'src/environments/environment';
 import type { LoginRequest } from '../../types/auth';
 
 @Component({
@@ -22,19 +24,19 @@ import type { LoginRequest } from '../../types/auth';
     MatInputModule,
     MatButtonModule,
     RouterLink,
+    NgxTurnstileModule,
   ],
   templateUrl: './login-form.html',
   styleUrls: ['./login-form.scss'],
 })
 export class LoginForm {
   formBuilder = inject(FormBuilder);
-
   submitForm: OutputEmitterRef<LoginRequest> = output<LoginRequest>();
   navigateToRegister: OutputEmitterRef<void> = output<void>();
-
   errorMessage = input<string | null>(null);
-
   hide = signal(true);
+  turnstileToken = signal<string | null>(null);
+  siteKey = environment.turnstileSiteKey;
 
   loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
@@ -42,9 +44,20 @@ export class LoginForm {
   });
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      this.submitForm.emit(this.loginForm.getRawValue());
+    if (this.loginForm.valid && this.turnstileToken()) {
+      this.submitForm.emit({
+        ...this.loginForm.getRawValue(),
+        turnstileToken: this.turnstileToken()!,
+      });
     }
+  }
+
+  onTurnstileResolved(token: string | null): void {
+    this.turnstileToken.set(token);
+  }
+
+  onTurnstileExpired(): void {
+    this.turnstileToken.set(null);
   }
 
   clickEvent(event: MouseEvent): void {

@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 
 import { LoginForm } from './login-form';
 import type { LoginRequest } from '../../types/auth';
+import { loginRequestMock } from '../../mocks/authMock';
 
 describe('Given a LoginForm component', () => {
   let component: LoginForm;
@@ -122,6 +123,10 @@ describe('Given a LoginForm component', () => {
   });
 
   describe('When submitting the form', () => {
+    beforeEach(() => {
+      component.turnstileToken.set(loginRequestMock.turnstileToken);
+    });
+
     it('Should be invalid when form is empty', () => {
       expect(component.loginForm.valid).toBeFalsy();
     });
@@ -137,6 +142,7 @@ describe('Given a LoginForm component', () => {
       const loginData: LoginRequest = {
         email: 'hugo@example.com',
         password: 'Password123!',
+        turnstileToken: 'mock-turnstile-token',
       };
 
       component.email.setValue(loginData.email);

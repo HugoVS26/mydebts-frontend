@@ -52,7 +52,11 @@
 
     <mat-card-actions class="login-form__actions">
       <div class="login-form__actions-container">
-        <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid" class="login-form__submit">
+        <ngx-turnstile [siteKey]="siteKey" theme="auto" (resolved)="onTurnstileResolved($event)"
+          (errored)="onTurnstileExpired()" />
+
+        <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid || !turnstileToken()"
+          class="login-form__submit">
           Log In
         </button>
 

@@ -5,6 +5,7 @@ export const registerRequestMock: RegisterRequest = {
   lastName: 'García',
   email: 'jose@example.com',
   password: 'Password123!',
+  turnstileToken: 'mock-turnstile-token',
 };
 
 export const authResponseMock: AuthResponse = {
@@ -22,4 +23,5 @@ export const authResponseMock: AuthResponse = {
 export const loginRequestMock: LoginRequest = {
   email: 'jose@example.com',
   password: 'Password123!',
+  turnstileToken: 'mock-turnstile-token',
 };

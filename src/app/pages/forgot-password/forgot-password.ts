@@ -6,6 +6,7 @@ import { PublicNavbar } from 'src/app/shared/components/public-navbar/public-nav
 import { ForgotPasswordForm } from 'src/app/features/auth/components/forgot-password-form/forgot-password-form';
 import { ForgotPasswordSuccess } from 'src/app/features/auth/components/forgot-password-success/forgot-password-success';
 import { AuthService } from 'src/app/features/auth/services/auth';
+import type { ForgotPasswordSubmit } from 'src/app/features/auth/types/auth';
 
 @Component({
   selector: 'app-forgot-password-page',
@@ -22,10 +23,10 @@ export class ForgotPasswordPage {
   errorMessage = signal<string | null>(null);
   submitted = signal(false);
 
-  onForgotPassword(email: string): void {
+  onForgotPassword(data: ForgotPasswordSubmit): void {
     this.errorMessage.set(null);
 
-    this.authService.forgotPassword(email).subscribe({
+    this.authService.forgotPassword(data.email, data.turnstileToken).subscribe({
       next: () => {
         this.submitted.set(true);
       },

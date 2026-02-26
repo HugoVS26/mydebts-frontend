@@ -7,9 +7,15 @@ import type { HttpErrorResponse } from '@angular/common/http';
 
 import { ForgotPasswordPage } from './forgot-password';
 import { AuthService } from 'src/app/features/auth/services/auth';
+import type { ForgotPasswordSubmit } from 'src/app/features/auth/types/auth';
 
 const mockAuthService = {
   forgotPassword: vi.fn(),
+};
+
+const mockSubmit: ForgotPasswordSubmit = {
+  email: 'test@mail.dev',
+  turnstileToken: 'mock-turnstile-token',
 };
 
 describe('Given a ForgotPasswordPage component', () => {
@@ -52,18 +58,21 @@ describe('Given a ForgotPasswordPage component', () => {
   });
 
   describe('When onForgotPassword is called with a valid email', () => {
-    it('Should call forgotPassword method with the email', () => {
+    it('Should call forgotPassword method with email and turnstile token', () => {
       mockAuthService.forgotPassword.mockReturnValue(of({ message: 'sent' }));
 
-      component.onForgotPassword('test@mail.dev');
+      component.onForgotPassword(mockSubmit);
 
-      expect(mockAuthService.forgotPassword).toHaveBeenCalledWith('test@mail.dev');
+      expect(mockAuthService.forgotPassword).toHaveBeenCalledWith(
+        mockSubmit.email,
+        mockSubmit.turnstileToken,
+      );
     });
 
     it('Should set submitted to true on success', () => {
       mockAuthService.forgotPassword.mockReturnValue(of({ message: 'sent' }));
 
-      component.onForgotPassword('test@mail.dev');
+      component.onForgotPassword(mockSubmit);
 
       expect(component.submitted()).toBeTruthy();
     });
@@ -72,7 +81,7 @@ describe('Given a ForgotPasswordPage component', () => {
       component.errorMessage.set('Previous error');
       mockAuthService.forgotPassword.mockReturnValue(of({ message: 'sent' }));
 
-      component.onForgotPassword('test@mail.dev');
+      component.onForgotPassword(mockSubmit);
 
       expect(component.errorMessage()).toBeNull();
     });
@@ -83,7 +92,7 @@ describe('Given a ForgotPasswordPage component', () => {
       const error = { status: 500 } as HttpErrorResponse;
       mockAuthService.forgotPassword.mockReturnValue(throwError(() => error));
 
-      component.onForgotPassword('test@mail.dev');
+      component.onForgotPassword(mockSubmit);
 
       expect(component.errorMessage()).toBe('Something went wrong. Please try again.');
     });
@@ -92,7 +101,7 @@ describe('Given a ForgotPasswordPage component', () => {
       const error = { status: 0 } as HttpErrorResponse;
       mockAuthService.forgotPassword.mockReturnValue(throwError(() => error));
 
-      component.onForgotPassword('test@mail.dev');
+      component.onForgotPassword(mockSubmit);
 
       expect(component.errorMessage()).toBe(
         'Cannot connect to server. Please check your internet connection.',
@@ -103,7 +112,7 @@ describe('Given a ForgotPasswordPage component', () => {
       const error = { status: 500 } as HttpErrorResponse;
       mockAuthService.forgotPassword.mockReturnValue(throwError(() => error));
 
-      component.onForgotPassword('test@mail.dev');
+      component.onForgotPassword(mockSubmit);
 
       expect(component.submitted()).toBeFalsy();
     });

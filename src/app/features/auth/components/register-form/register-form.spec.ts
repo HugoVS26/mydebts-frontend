@@ -4,6 +4,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 
 import type { RegisterRequest } from '../../types/auth';
 import { RegisterForm } from './register-form';
+import { registerRequestMock } from '../../mocks/authMock';
 
 describe('Given a RegisterForm component', () => {
   let component: RegisterForm;
@@ -271,6 +272,10 @@ describe('Given a RegisterForm component', () => {
   });
 
   describe('When we want to submit the form', () => {
+    beforeEach(() => {
+      component.turnstileToken.set(registerRequestMock.turnstileToken);
+    });
+
     it('Should be invalid when empty', () => {
       expect(component.registerForm.valid).toBeFalsy();
     });
@@ -291,6 +296,7 @@ describe('Given a RegisterForm component', () => {
         lastName: 'García',
         email: 'hugo@example.com',
         password: 'Password123!',
+        turnstileToken: 'mock-turnstile-token',
       };
 
       component.firstName.setValue(formData.firstName);
