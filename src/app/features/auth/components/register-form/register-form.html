@@ -138,7 +138,10 @@
 
     <mat-card-actions class="register-form__actions">
       <div class="register-form__actions-container">
-        <button mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid"
+        <ngx-turnstile [siteKey]="siteKey" theme="auto" (resolved)="onTurnstileResolved($event)"
+          (errored)="onTurnstileExpired()" />
+
+        <button mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid || !turnstileToken()"
           class="register-form__submit">
           Sign Up
         </button>

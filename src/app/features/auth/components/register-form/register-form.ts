@@ -7,7 +7,9 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { NgxTurnstileModule } from 'ngx-turnstile';
 
+import { environment } from 'src/environments/environment';
 import type { RegisterRequest } from '../../types/auth';
 import { passwordComplexityValidator } from '../../validators/password-complexity.validator';
 import { passwordMatchValidator } from '../../validators/password-match-validator';
@@ -22,19 +24,20 @@ import { passwordMatchValidator } from '../../validators/password-match-validato
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    NgxTurnstileModule,
   ],
   templateUrl: './register-form.html',
   styleUrls: ['./register-form.scss'],
 })
 export class RegisterForm {
-  formBuilder = inject(FormBuilder);
+  private formBuilder = inject(FormBuilder);
 
   submitForm: OutputEmitterRef<RegisterRequest> = output<RegisterRequest>();
   navigateToLogin: OutputEmitterRef<void> = output<void>();
-
   errorMessage = input<string | null>(null);
-
   hide = signal(true);
+  turnstileToken = signal<string | null>(null);
+  siteKey = environment.turnstileSiteKey;
 
   registerForm = this.formBuilder.nonNullable.group({
     firstName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
@@ -58,19 +61,6 @@ export class RegisterForm {
         this.confirmPassword.updateValueAndValidity();
       }
     });
-  }
-
-  onSubmit(): void {
-    if (this.registerForm.valid) {
-      const formValue = this.registerForm.getRawValue();
-      const registerData: RegisterRequest = {
-        firstName: formValue.firstName,
-        lastName: formValue.lastName,
-        email: formValue.email,
-        password: formValue.password,
-      };
-      this.submitForm.emit(registerData);
-    }
   }
 
   clickEvent(event: MouseEvent): void {
@@ -141,5 +131,27 @@ export class RegisterForm {
     const password = this.password.value;
     const confirmPassword = this.confirmPassword.value;
     return password === confirmPassword && confirmPassword.length > 0;
+  }
+
+  onSubmit(): void {
+    if (this.registerForm.valid && this.turnstileToken()) {
+      const formValue = this.registerForm.getRawValue();
+      const registerData: RegisterRequest = {
+        firstName: formValue.firstName,
+        lastName: formValue.lastName,
+        email: formValue.email,
+        password: formValue.password,
+        turnstileToken: this.turnstileToken()!,
+      };
+      this.submitForm.emit(registerData);
+    }
+  }
+
+  onTurnstileResolved(token: string | null): void {
+    this.turnstileToken.set(token);
+  }
+
+  onTurnstileExpired(): void {
+    this.turnstileToken.set(null);
   }
 }
