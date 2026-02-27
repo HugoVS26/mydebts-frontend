@@ -9,6 +9,7 @@ import { ForgotPasswordPage } from './pages/forgot-password/forgot-password';
 import { authGuard } from './core/guards/auth/auth.guard';
 import { guestGuard } from './core/guards/guest/guest.guard';
 import { ResetPasswordPage } from './pages/reset-password/reset-password';
+import { NotFoundPage } from './pages/not-found/not-found';
 
 export const routes: Routes = [
   { path: '', component: HomePage, canActivate: [guestGuard] },
@@ -28,4 +29,6 @@ export const routes: Routes = [
       { path: ':debtId', component: DebtDetailPage },
     ],
   },
+
+  { path: '**', component: NotFoundPage },
 ];
