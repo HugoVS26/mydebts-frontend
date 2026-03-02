@@ -40,22 +40,8 @@
 </div>
 
 <div class="debt-list">
-  <div class="debt-list__column">
-    <h3 class="debt-list__column-title">Unpaid</h3>
-    <ol class="debt-list__cards">
-      @for (debt of (filteredDebts$ | async)?.['unpaid']; track trackByDebtId($index, debt)) {
-      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
-      } @empty {
-      <li class="debt-list__card-item debt-list__empty">
-        You have no unpaid debts. <br> Enjoy your day! 🎉
-      </li>
-      }
-    </ol>
-  </div>
 
-  <mat-divider class="debt-list__divider" [vertical]="isDesktop$ | async"></mat-divider>
-
-  <div class="debt-list__column">
+  <div class="debt-list__column debt-list__column--overdue">
     <h3 class="debt-list__column-title">Overdue</h3>
     <ol class="debt-list__cards">
       @for (debt of (filteredDebts$ | async)?.['overdue']; track trackByDebtId($index, debt)) {
@@ -68,9 +54,22 @@
     </ol>
   </div>
 
-  <mat-divider class="debt-list__divider" [vertical]="isDesktop$ | async"></mat-divider>
 
-  <div class="debt-list__column">
+  <div class="debt-list__column debt-list__column--unpaid">
+    <h3 class="debt-list__column-title">Unpaid</h3>
+    <ol class="debt-list__cards">
+      @for (debt of (filteredDebts$ | async)?.['unpaid']; track trackByDebtId($index, debt)) {
+      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
+      } @empty {
+      <li class="debt-list__card-item debt-list__empty">
+        You have no unpaid debts. <br> Enjoy your day! 🎉
+      </li>
+      }
+    </ol>
+  </div>
+
+
+  <div class="debt-list__column debt-list__column--paid">
     <div class="debt-list__column-header">
       <h3 class="debt-list__column-title">Paid</h3>
       @if ((filteredDebts$ | async)?.['paid']?.length) {
