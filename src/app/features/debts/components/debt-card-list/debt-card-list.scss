@@ -6,13 +6,14 @@
 
   @media (min-width: 1024px) {
     align-items: stretch;
+    padding: 0;
   }
 }
 
 .debt-list {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 4rem;
   align-items: center;
   width: 100%;
 
@@ -27,7 +28,7 @@
     padding-top: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     gap: 1.5rem;
     width: 100%;
@@ -38,7 +39,8 @@
       justify-content: space-between;
       align-items: center;
       align-content: flex-start;
-      padding: 1rem 0;
+      padding-top: 1.5rem;
+      padding-bottom: 2rem;
 
       .debt-list__filters {
         order: 1;
@@ -55,6 +57,10 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+
+    @media (min-width: 1024px) {
+      align-self: flex-start;
+    }
   }
 
   &__filters {
@@ -77,13 +83,32 @@
     gap: 1rem;
     width: 100%;
     max-width: 300px;
+    @media (min-width: 1024px) {
+      &:not(:last-child) {
+        border-right: 1px solid var(--mat-sys-outline, rgba(0, 0, 0, 0.12));
+        padding-right: 3rem;
+      }
+    }
+
+    &:has(.debt-list__empty) {
+      @media (max-width: 1023px) {
+        display: none;
+      }
+    }
   }
 
   &__column-header {
+    margin: 0;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 0.5rem;
+
+    h3 {
+      margin-block-start: 0;
+      margin-block-end: 0;
+    }
 
     button {
       position: absolute;
@@ -91,14 +116,45 @@
       background-color: transparent;
       border: none;
       cursor: pointer;
+      color: var(--mat-sys-inverse-surface);
     }
   }
 
   &__column-title {
+    margin: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
     margin-bottom: 0.5rem;
     font-size: 1.25rem;
     text-align: center;
     text-transform: uppercase;
+  }
+
+  &__column--overdue {
+    order: 1;
+    @media (min-width: 1024px) {
+      order: 2;
+    }
+  }
+  &__column--unpaid {
+    order: 2;
+    @media (min-width: 1024px) {
+      order: 1;
+    }
+  }
+  &__column--paid {
+    order: 3;
+    @media (min-width: 1024px) {
+      order: 3;
+    }
+  }
+
+  &__column {
+    &:has(.debt-list__empty) {
+      @media (max-width: 1023px) {
+        display: none;
+      }
+    }
   }
 
   &__cards {
