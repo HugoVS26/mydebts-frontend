@@ -1,7 +1,12 @@
 @use '../../styles/mixins' as mix;
+@use '../../styles/variables' as var;
 
 .home {
   @include mix.page-container;
+  min-height: calc(100vh - var.$toolbar-standard-height);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 .home__main {
@@ -32,6 +37,10 @@
   font-size: 3rem;
   margin-bottom: 1rem;
   font-weight: bold;
+
+  @media (max-width: 1024px) {
+    font-size: 2rem;
+  }
 }
 
 .split-text__container {
@@ -90,9 +99,14 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   align-items: start;
-  padding: 2rem 0;
   max-width: 1000px;
   margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+
+  @media (max-width: 1024px) {
+    padding: 0;
+  }
 
   .debt-card {
     pointer-events: none;
@@ -146,7 +160,6 @@
 .home__features {
   padding: 4rem 2rem;
   max-width: 1200px;
-  margin: 0 auto;
 }
 
 .home__features h2 {

@@ -1,15 +1,23 @@
 import type { OnInit } from '@angular/core';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  CUSTOM_ELEMENTS_SCHEMA,
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink } from '@angular/router';
+import 'github-corner-element';
 
 @Component({
   selector: 'app-public-navbar',
   standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     MatToolbarModule,
     MatSlideToggleModule,
