@@ -27,6 +27,7 @@ import { passwordMatchValidator } from '../../validators/password-match-validato
 })
 export class ResetPasswordForm {
   private formBuilder = inject(FormBuilder);
+  isLoading = input<boolean>(false);
 
   submitForm: OutputEmitterRef<string> = output<string>();
   errorMessage = input<string | null>(null);

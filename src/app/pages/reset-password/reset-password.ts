@@ -6,6 +6,7 @@ import type { HttpErrorResponse } from '@angular/common/http';
 import { PublicNavbar } from 'src/app/shared/components/public-navbar/public-navbar';
 import { ResetPasswordForm } from 'src/app/features/auth/components/reset-password-form/reset-password-form';
 import { AuthService } from 'src/app/features/auth/services/auth';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-reset-password-page',
@@ -19,6 +20,7 @@ export class ResetPasswordPage implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  isLoading = signal(false);
 
   errorMessage = signal<string | null>(null);
   token = signal<string | null>(null);
@@ -40,26 +42,30 @@ export class ResetPasswordPage implements OnInit {
     if (!token) return;
 
     this.errorMessage.set(null);
+    this.isLoading.set(true);
 
-    this.authService.resetPassword(token, newPassword).subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error('Reset password failed:', error);
+    this.authService
+      .resetPassword(token, newPassword)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Reset password failed:', error);
 
-        let message = 'Something went wrong. Please try again.';
+          let message = 'Something went wrong. Please try again.';
 
-        if (error.status === 0) {
-          message = 'Cannot connect to server. Please check your internet connection.';
-        }
+          if (error.status === 0) {
+            message = 'Cannot connect to server. Please check your internet connection.';
+          }
 
-        if (error.status === 400) {
-          message = 'Your reset link is invalid or has expired. Please request a new one.';
-        }
+          if (error.status === 400) {
+            message = 'Your reset link is invalid or has expired. Please request a new one.';
+          }
 
-        this.errorMessage.set(message);
-      },
-    });
+          this.errorMessage.set(message);
+        },
+      });
   }
 }
