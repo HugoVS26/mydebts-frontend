@@ -6,6 +6,7 @@ import { PublicNavbar } from 'src/app/shared/components/public-navbar/public-nav
 import { LoginForm } from 'src/app/features/auth/components/login-form/login-form';
 import { AuthService } from 'src/app/features/auth/services/auth';
 import type { LoginRequest } from 'src/app/features/auth/types/auth';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login-page',
@@ -18,31 +19,34 @@ export class LoginPage {
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
   onLogin(data: LoginRequest): void {
     this.errorMessage.set(null);
+    this.isLoading.set(true);
 
-    this.authService.login(data).subscribe({
-      next: () => {
-        this.router.navigate(['/debts']);
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error('Login failed:', error);
+    this.authService
+      .login(data)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/debts']);
+        },
+        error: (error: HttpErrorResponse) => {
+          let message = 'Login failed. Please try again.';
 
-        let message = 'Login failed. Please try again.';
+          if (error.status === 401) {
+            message = 'Invalid email or password. Please try again.';
+          } else if (error.status === 400) {
+            message = error.error?.message || 'Invalid login data. Please check your information.';
+          } else if (error.status === 0) {
+            message = 'Cannot connect to server. Please check your internet connection.';
+          }
 
-        if (error.status === 401) {
-          message = 'Invalid email or password. Please try again.';
-        } else if (error.status === 400) {
-          message = error.error?.message || 'Invalid login data. Please check your information.';
-        } else if (error.status === 0) {
-          message = 'Cannot connect to server. Please check your internet connection.';
-        }
-
-        this.errorMessage.set(message);
-      },
-    });
+          this.errorMessage.set(message);
+        },
+      });
   }
 
   onNavigateToRegister(): void {

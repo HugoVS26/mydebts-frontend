@@ -55,8 +55,8 @@
         <ngx-turnstile [siteKey]="siteKey" theme="auto" (resolved)="onTurnstileResolved($event)"
           (errored)="onTurnstileExpired()" />
 
-        <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid || !turnstileToken()"
-          class="login-form__submit">
+        <button mat-flat-button color="primary" type="submit"
+          [disabled]="loginForm.invalid || !turnstileToken() || isLoading()" class="login-form__submit">
           Log In
         </button>
 

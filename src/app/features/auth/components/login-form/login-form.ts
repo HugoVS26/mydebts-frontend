@@ -37,6 +37,7 @@ export class LoginForm {
   hide = signal(true);
   turnstileToken = signal<string | null>(null);
   siteKey = environment.turnstileSiteKey;
+  isLoading = input<boolean>(false);
 
   loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
