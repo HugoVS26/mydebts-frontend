@@ -141,8 +141,8 @@
         <ngx-turnstile [siteKey]="siteKey" theme="auto" (resolved)="onTurnstileResolved($event)"
           (errored)="onTurnstileExpired()" />
 
-        <button mat-flat-button color="primary" type="submit" [disabled]="registerForm.invalid || !turnstileToken()"
-          class="register-form__submit">
+        <button mat-flat-button color="primary" type="submit"
+          [disabled]="registerForm.invalid || !turnstileToken() || isLoading()" class="register-form__submit">
           Sign Up
         </button>
 

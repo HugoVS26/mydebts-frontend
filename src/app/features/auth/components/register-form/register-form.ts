@@ -38,6 +38,7 @@ export class RegisterForm {
   hide = signal(true);
   turnstileToken = signal<string | null>(null);
   siteKey = environment.turnstileSiteKey;
+  isLoading = input<boolean>(false);
 
   registerForm = this.formBuilder.nonNullable.group({
     firstName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],

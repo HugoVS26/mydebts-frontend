@@ -7,6 +7,7 @@ import { ForgotPasswordForm } from 'src/app/features/auth/components/forgot-pass
 import { ForgotPasswordSuccess } from 'src/app/features/auth/components/forgot-password-success/forgot-password-success';
 import { AuthService } from 'src/app/features/auth/services/auth';
 import type { ForgotPasswordSubmit } from 'src/app/features/auth/types/auth';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-forgot-password-page',
@@ -20,28 +21,31 @@ export class ForgotPasswordPage {
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   submitted = signal(false);
 
   onForgotPassword(data: ForgotPasswordSubmit): void {
     this.errorMessage.set(null);
+    this.isLoading.set(true);
 
-    this.authService.forgotPassword(data.email, data.turnstileToken).subscribe({
-      next: () => {
-        this.submitted.set(true);
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error('Forgot password failed:', error);
+    this.authService
+      .forgotPassword(data.email, data.turnstileToken)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: () => {
+          this.submitted.set(true);
+        },
+        error: (error: HttpErrorResponse) => {
+          let message = 'Something went wrong. Please try again.';
 
-        let message = 'Something went wrong. Please try again.';
+          if (error.status === 0) {
+            message = 'Cannot connect to server. Please check your internet connection.';
+          }
 
-        if (error.status === 0) {
-          message = 'Cannot connect to server. Please check your internet connection.';
-        }
-
-        this.errorMessage.set(message);
-      },
-    });
+          this.errorMessage.set(message);
+        },
+      });
   }
 
   onNavigateToLogin(): void {

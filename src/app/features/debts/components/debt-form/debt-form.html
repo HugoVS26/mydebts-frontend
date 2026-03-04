@@ -81,10 +81,17 @@
 
     <mat-card-actions align="end">
       <button mat-stroked-button color="secondary" type="button" (click)="onCancel()">Cancel</button>
-      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || hasNoChanges">
-        {{ mode === 'create' ? 'Create' : 'Update' }}
+      <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || hasNoChanges || isLoading()">
+        {{ isLoading() ? 'Saving...' : mode === 'create' ? 'Create' : 'Update' }}
       </button>
     </mat-card-actions>
+
+    @if (errorMessage()) {
+    <div class="debt-form__error-alert">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+    }
   </mat-card>
 </form>
 }

@@ -5,6 +5,7 @@ import {
   Component,
   EventEmitter,
   inject,
+  input,
   Input,
   Output,
   signal,
@@ -21,6 +22,7 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 
 import type { IDebt, IDebtCreate, IDebtUpdate } from '../../types/debt';
 import { AuthService } from 'src/app/features/auth/services/auth';
+import { MatIcon } from '@angular/material/icon';
 
 interface DebtFormValues {
   counterparty: string;
@@ -38,6 +40,7 @@ interface DebtFormValues {
     MatCardModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatIcon,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -58,7 +61,9 @@ export class DebtForm implements OnInit, OnChanges {
 
   form: FormGroup;
   debtMode = signal<'creditor' | 'debtor'>('creditor');
+  errorMessage = input<string | null>(null);
   formReady = signal(false);
+  isLoading = input<boolean>(false);
 
   private formBuilder = inject(FormBuilder);
   private authService = inject(AuthService);

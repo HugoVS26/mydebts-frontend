@@ -6,6 +6,7 @@ import { Navbar } from 'src/app/shared/components/navbar/navbar';
 import { RegisterForm } from 'src/app/features/auth/components/register-form/register-form';
 import { AuthService } from 'src/app/features/auth/services/auth';
 import type { RegisterRequest } from 'src/app/features/auth/types/auth';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-register-page',
@@ -18,33 +19,38 @@ export class RegisterPage {
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
   onRegister(data: RegisterRequest): void {
     this.errorMessage.set(null);
+    this.isLoading.set(true);
 
-    this.authService.register(data).subscribe({
-      next: () => {
-        this.router.navigate(['/debts']);
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error('Registration failed:', error);
+    this.authService
+      .register(data)
+      .pipe(finalize(() => this.isLoading.set(true)))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/debts']);
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Registration failed:', error);
 
-        let message = 'Registration failed. Please try again.';
+          let message = 'Registration failed. Please try again.';
 
-        if (error.status === 409) {
-          message =
-            'This email is already registered. Please use a different email or try logging in.';
-        } else if (error.status === 400) {
-          message =
-            error.error?.message || 'Invalid registration data. Please check your information.';
-        } else if (error.status === 0) {
-          message = 'Cannot connect to server. Please check your internet connection.';
-        }
+          if (error.status === 409) {
+            message =
+              'This email is already registered. Please use a different email or try logging in.';
+          } else if (error.status === 400) {
+            message =
+              error.error?.message || 'Invalid registration data. Please check your information.';
+          } else if (error.status === 0) {
+            message = 'Cannot connect to server. Please check your internet connection.';
+          }
 
-        this.errorMessage.set(message);
-      },
-    });
+          this.errorMessage.set(message);
+        },
+      });
   }
 
   onNavigateToLogin(): void {
