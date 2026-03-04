@@ -35,6 +35,7 @@ export class ForgotPasswordForm {
   errorMessage = input<string | null>(null);
   turnstileToken = signal<string | null>(null);
   siteKey = environment.turnstileSiteKey;
+  isLoading = input<boolean>(false);
 
   forgotPasswordForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
