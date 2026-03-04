@@ -9,6 +9,7 @@ import localeEs from '@angular/common/locales/es';
 import { routes } from './app.routes';
 import { authInterceptor } from './features/auth/interceptors/auth.interceptor';
 import { errorInterceptor } from './features/auth/interceptors/error.interceptor';
+import { serverWakeInterceptor } from './core/interceptors/server-wake.interceptor';
 
 registerLocaleData(localeEs);
 
@@ -17,7 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    provideHttpClient(withInterceptors([serverWakeInterceptor, authInterceptor, errorInterceptor])),
     { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
   ],
 };
