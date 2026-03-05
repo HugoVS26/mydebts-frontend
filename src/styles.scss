@@ -98,3 +98,17 @@ body {
     padding-top: var(--mat-toolbar-mobile-height);
   }
 }
+
+.snackbar--success {
+  .mdc-snackbar__surface {
+    background-color: var(--mat-sys-error-container) !important;
+    color: #fff !important;
+  }
+}
+
+.snackbar--error {
+  .mdc-snackbar__surface {
+    background-color: var(--mat-sys-error-container) !important;
+    color: #fff !important;
+  }
+}
