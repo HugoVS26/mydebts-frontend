@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal, ViewChild } from '@angular/core';
 import type { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { PublicNavbar } from 'src/app/shared/components/public-navbar/public-navbar';
 
-import { Navbar } from 'src/app/shared/components/navbar/navbar';
 import { RegisterForm } from 'src/app/features/auth/components/register-form/register-form';
 import { AuthService } from 'src/app/features/auth/services/auth';
 import type { RegisterRequest } from 'src/app/features/auth/types/auth';
@@ -10,7 +10,7 @@ import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-register-page',
-  imports: [RegisterForm, Navbar],
+  imports: [RegisterForm, PublicNavbar],
   templateUrl: './register.html',
   styleUrl: './register.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
