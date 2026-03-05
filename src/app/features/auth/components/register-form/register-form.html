@@ -136,6 +136,15 @@
       </div>
     </mat-card-content>
 
+    <mat-card-footer>
+      @if (errorMessage()) {
+      <div class="register-form__error-alert">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+      }
+    </mat-card-footer>
+
     <mat-card-actions class="register-form__actions">
       <div class="register-form__actions-container">
         <ngx-turnstile [siteKey]="siteKey" theme="auto" (resolved)="onTurnstileResolved($event)"
@@ -154,13 +163,6 @@
       </div>
     </mat-card-actions>
 
-    <mat-card-footer>
-      @if (errorMessage()) {
-      <div class="register-form__error-alert">
-        <mat-icon>error</mat-icon>
-        <span>{{ errorMessage() }}</span>
-      </div>
-      }
-    </mat-card-footer>
+
   </mat-card>
 </form>
