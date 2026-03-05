@@ -11,7 +11,7 @@ import { debtsMock } from 'src/app/features/debts/mocks/debtsMock';
 import type { IDebt } from 'src/app/features/debts/types/debt';
 import { of, throwError } from 'rxjs';
 
-describe('DebtDetail', () => {
+describe('Given a DebtDetail page', () => {
   let component: DebtDetailPage;
   let fixture: ComponentFixture<DebtDetailPage>;
   let debtsService: { getDebtById: ReturnType<typeof vi.fn> };

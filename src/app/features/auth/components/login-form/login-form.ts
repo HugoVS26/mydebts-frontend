@@ -1,5 +1,5 @@
 import type { OutputEmitterRef } from '@angular/core';
-import { Component, inject, output, signal, input } from '@angular/core';
+import { Component, inject, output, signal, input, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import type { FormControl } from '@angular/forms';
@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
-import { NgxTurnstileModule } from 'ngx-turnstile';
+import { NgxTurnstileComponent, NgxTurnstileModule } from 'ngx-turnstile';
 
 import { environment } from 'src/environments/environment';
 import type { LoginRequest } from '../../types/auth';
@@ -31,18 +31,31 @@ import type { LoginRequest } from '../../types/auth';
 })
 export class LoginForm {
   formBuilder = inject(FormBuilder);
-  submitForm: OutputEmitterRef<LoginRequest> = output<LoginRequest>();
-  navigateToRegister: OutputEmitterRef<void> = output<void>();
-  errorMessage = input<string | null>(null);
+  siteKey = environment.turnstileSiteKey;
+
+  @ViewChild(NgxTurnstileComponent) private turnstile!: NgxTurnstileComponent;
+
   hide = signal(true);
   turnstileToken = signal<string | null>(null);
-  siteKey = environment.turnstileSiteKey;
+
+  errorMessage = input<string | null>(null);
   isLoading = input<boolean>(false);
+
+  submitForm: OutputEmitterRef<LoginRequest> = output<LoginRequest>();
+  navigateToRegister: OutputEmitterRef<void> = output<void>();
 
   loginForm = this.formBuilder.nonNullable.group({
     email: ['', [Validators.required, Validators.email, Validators.maxLength(254)]],
     password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(128)]],
   });
+
+  get email(): FormControl<string> {
+    return this.loginForm.controls.email;
+  }
+
+  get password(): FormControl<string> {
+    return this.loginForm.controls.password;
+  }
 
   onSubmit(): void {
     if (this.loginForm.valid && this.turnstileToken()) {
@@ -51,14 +64,6 @@ export class LoginForm {
         turnstileToken: this.turnstileToken()!,
       });
     }
-  }
-
-  onTurnstileResolved(token: string | null): void {
-    this.turnstileToken.set(token);
-  }
-
-  onTurnstileExpired(): void {
-    this.turnstileToken.set(null);
   }
 
   clickEvent(event: MouseEvent): void {
@@ -70,11 +75,16 @@ export class LoginForm {
     this.navigateToRegister.emit();
   }
 
-  get email(): FormControl<string> {
-    return this.loginForm.controls.email;
+  onTurnstileResolved(token: string | null): void {
+    this.turnstileToken.set(token);
   }
 
-  get password(): FormControl<string> {
-    return this.loginForm.controls.password;
+  onTurnstileExpired(): void {
+    this.turnstileToken.set(null);
+  }
+
+  resetTurnstile(): void {
+    this.turnstile.reset();
+    this.turnstileToken.set(null);
   }
 }

@@ -11,7 +11,7 @@ import { DebtsService } from 'src/app/features/debts/services/debts';
 import { createDebtMock } from 'src/app/features/debts/mocks/debtsMock';
 import type { IDebtCreate, IDebtUpdate } from 'src/app/features/debts/types/debt';
 
-describe('DebtForm', () => {
+describe('Given DebtForm page', () => {
   let component: DebtFormPage;
   let fixture: ComponentFixture<DebtFormPage>;
   let debtsService: DebtsService;

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, ViewChild } from '@angular/core';
 import type { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -19,6 +19,8 @@ export class RegisterPage {
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  @ViewChild(RegisterForm) private registerForm!: RegisterForm;
+
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
@@ -28,32 +30,29 @@ export class RegisterPage {
 
     this.authService
       .register(data)
-      .pipe(finalize(() => this.isLoading.set(true)))
+      .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
           this.router.navigate(['/debts']);
         },
         error: (error: HttpErrorResponse) => {
-          console.error('Registration failed:', error);
-
-          let message = 'Registration failed. Please try again.';
-
-          if (error.status === 409) {
-            message =
-              'This email is already registered. Please use a different email or try logging in.';
-          } else if (error.status === 400) {
-            message =
-              error.error?.message || 'Invalid registration data. Please check your information.';
-          } else if (error.status === 0) {
-            message = 'Cannot connect to server. Please check your internet connection.';
-          }
-
-          this.errorMessage.set(message);
+          this.errorMessage.set(this.getErrorMessage(error));
+          this.registerForm.resetTurnstile();
         },
       });
   }
 
   onNavigateToLogin(): void {
     this.router.navigate(['/login']);
+  }
+
+  private getErrorMessage(error: HttpErrorResponse): string {
+    if (error.status === 409)
+      return 'This email is already registered. Please use a different email or try logging in.';
+    if (error.status === 400)
+      return error.error?.message || 'Invalid registration data. Please check your information.';
+    if (error.status === 0)
+      return 'Cannot connect to server. Please check your internet connection.';
+    return 'Registration failed. Please try again.';
   }
 }
