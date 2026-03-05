@@ -1,5 +1,5 @@
 import type { OutputEmitterRef } from '@angular/core';
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import type { FormControl } from '@angular/forms';
@@ -7,7 +7,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { NgxTurnstileModule } from 'ngx-turnstile';
+import { NgxTurnstileComponent, NgxTurnstileModule } from 'ngx-turnstile';
 
 import { environment } from 'src/environments/environment';
 import type { RegisterRequest } from '../../types/auth';
@@ -31,14 +31,18 @@ import { passwordMatchValidator } from '../../validators/password-match-validato
 })
 export class RegisterForm {
   private formBuilder = inject(FormBuilder);
+  siteKey = environment.turnstileSiteKey;
+
+  @ViewChild(NgxTurnstileComponent) private turnstile!: NgxTurnstileComponent;
+
+  hide = signal(true);
+  turnstileToken = signal<string | null>(null);
+
+  errorMessage = input<string | null>(null);
+  isLoading = input<boolean>(false);
 
   submitForm: OutputEmitterRef<RegisterRequest> = output<RegisterRequest>();
   navigateToLogin: OutputEmitterRef<void> = output<void>();
-  errorMessage = input<string | null>(null);
-  hide = signal(true);
-  turnstileToken = signal<string | null>(null);
-  siteKey = environment.turnstileSiteKey;
-  isLoading = input<boolean>(false);
 
   registerForm = this.formBuilder.nonNullable.group({
     firstName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
@@ -153,6 +157,11 @@ export class RegisterForm {
   }
 
   onTurnstileExpired(): void {
+    this.turnstileToken.set(null);
+  }
+
+  resetTurnstile(): void {
+    this.turnstile.reset();
     this.turnstileToken.set(null);
   }
 }
