@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import type { HttpErrorResponse } from '@angular/common/http';
 
@@ -19,6 +19,8 @@ export class LoginPage {
   private authService = inject(AuthService);
   private router = inject(Router);
 
+  @ViewChild(LoginForm) private loginForm!: LoginForm;
+
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
@@ -34,22 +36,22 @@ export class LoginPage {
           this.router.navigate(['/debts']);
         },
         error: (error: HttpErrorResponse) => {
-          let message = 'Login failed. Please try again.';
-
-          if (error.status === 401) {
-            message = 'Invalid email or password. Please try again.';
-          } else if (error.status === 400) {
-            message = error.error?.message || 'Invalid login data. Please check your information.';
-          } else if (error.status === 0) {
-            message = 'Cannot connect to server. Please check your internet connection.';
-          }
-
-          this.errorMessage.set(message);
+          this.errorMessage.set(this.getErrorMessage(error));
+          this.loginForm.resetTurnstile();
         },
       });
   }
 
   onNavigateToRegister(): void {
     this.router.navigate(['/register']);
+  }
+
+  private getErrorMessage(error: HttpErrorResponse): string {
+    if (error.status === 401) return 'Invalid email or password. Please try again.';
+    if (error.status === 400)
+      return error.error?.message || 'Invalid login data. Please check your information.';
+    if (error.status === 0)
+      return 'Cannot connect to server. Please check your internet connection.';
+    return 'Login failed. Please try again.';
   }
 }
