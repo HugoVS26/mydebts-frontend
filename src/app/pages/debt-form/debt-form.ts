@@ -4,9 +4,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Navbar } from 'src/app/shared/components/navbar/navbar';
 
+import type { IDebt, IDebtCreate, IDebtUpdate } from 'src/app/features/debts/types/debt';
 import { DebtForm } from 'src/app/features/debts/components/debt-form/debt-form';
 import { DebtsService } from 'src/app/features/debts/services/debts';
-import type { IDebt, IDebtCreate, IDebtUpdate } from 'src/app/features/debts/types/debt';
+import { SnackbarService } from 'src/app/core/services/snackbar';
 
 @Component({
   selector: 'app-debt-form-page',
@@ -19,13 +20,14 @@ export class DebtFormPage implements OnInit {
   private debtsService = inject(DebtsService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private snackbar = inject(SnackbarService);
+  private debtId: string | null = null;
 
   mode = signal<'create' | 'update'>('create');
   initialData = signal<IDebt | undefined>(undefined);
   errorMessage = signal<string | null>(null);
   isReady = signal(false);
   isLoading = signal(false);
-  private debtId: string | null = null;
 
   ngOnInit(): void {
     this.debtId = this.route.snapshot.paramMap.get('debtId');
@@ -53,6 +55,7 @@ export class DebtFormPage implements OnInit {
   handleFormSubmit(data: IDebtCreate | IDebtUpdate): void {
     this.isLoading.set(true);
 
+    const isCreate = this.mode() === 'create';
     const request$ =
       this.mode() === 'create'
         ? this.debtsService.createDebt(data as IDebtCreate)
@@ -60,11 +63,14 @@ export class DebtFormPage implements OnInit {
 
     request$.pipe(finalize(() => this.isLoading.set(false))).subscribe({
       next: () => {
+        this.snackbar.success(
+          isCreate ? 'Debt created successfully!' : 'Debt updated successfully!',
+        );
         const route = this.mode() === 'create' ? '/' : `/debts/${this.debtId}`;
         this.router.navigate([route]);
       },
       error: () => {
-        this.errorMessage.set('Something went wrong. Please try again.');
+        this.snackbar.error('Something went wrong. Please try again.');
       },
     });
   }

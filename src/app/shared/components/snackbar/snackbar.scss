@@ -1,0 +1,23 @@
+.snackbar {
+  display: flex;
+  align-items: center;
+}
+
+.snackbar__message {
+  flex: 1;
+  font-size: 14px;
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.snackbar__icon--error {
+  color: #fff !important;
+}
+
+.snackbar__icon--success {
+  color: var(--mat-sys-inverse-on-surface);
+}

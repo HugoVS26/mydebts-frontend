@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,12 +8,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
-import confetti from 'canvas-confetti';
 
 import { DebtsService } from '../../services/debts';
 import { AuthService } from 'src/app/features/auth/services/auth';
 import type { IDebt } from '../../types/debt';
-import { ConfirmDialog } from 'src/app/shared/components/confirm-dialog/confirm-dialog/confirm-dialog';
 
 interface CounterpartyInfo {
   displayName: string;
@@ -50,6 +48,10 @@ export class DebtDetail {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
+
+  readonly editDebt = output<void>();
+  readonly deleteDebt = output<void>();
+  readonly markAsPaid = output<void>();
 
   private readonly statusConfig = {
     paid: { icon: 'check', fontSet: 'material-icons', label: 'paid' },
@@ -96,60 +98,14 @@ export class DebtDetail {
   }
 
   onEdit(): void {
-    this.router.navigate(['/debts', this.debt._id, 'edit']);
+    this.editDebt.emit();
   }
 
   onDelete(): void {
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      data: {
-        title: 'Delete Debt',
-        message: `Are you sure you want to delete "${this.debt.description}"?`,
-        confirmText: 'Delete',
-        cancelText: 'Cancel',
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-      if (confirmed) {
-        this.debtsService.deleteDebt(this.debt._id).subscribe({
-          next: () => {
-            this.router.navigate(['/']);
-          },
-          error: (error) => {
-            console.error('Error deleting debt:', error);
-          },
-        });
-      }
-    });
+    this.deleteDebt.emit();
   }
 
   onMarkAsPaid(): void {
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      data: {
-        title: 'Mark as Paid',
-        message: `Mark "${this.debt.description}" as paid?`,
-        confirmText: 'Mark as Paid',
-        cancelText: 'Cancel',
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-      if (confirmed) {
-        this.debtsService.markDebtAsPaid(this.debt._id).subscribe({
-          next: () => {
-            confetti({
-              particleCount: 100,
-              angle: -90,
-              spread: 70,
-              origin: { y: 0 },
-            });
-            setTimeout(() => window.location.reload(), 1500);
-          },
-          error: (error) => {
-            console.error('Error marking debt as paid:', error);
-          },
-        });
-      }
-    });
+    this.markAsPaid.emit();
   }
 }

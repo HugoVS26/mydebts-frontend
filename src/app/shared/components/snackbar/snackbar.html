@@ -1,0 +1,6 @@
+<div class="snackbar">
+  <span class="snackbar__message">{{ data.message }}</span>
+  <button mat-icon-button (click)="snackBarRef.dismiss()">
+    <mat-icon [class]="'snackbar__icon--' + data.type">close</mat-icon>
+  </button>
+</div>

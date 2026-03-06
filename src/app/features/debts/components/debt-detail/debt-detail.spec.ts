@@ -1,17 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
-import { provideRouter, Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { MatDialog } from '@angular/material/dialog';
-import { of } from 'rxjs';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import type { ComponentFixture } from '@angular/core/testing';
-import type { Observable } from 'rxjs';
 
 import { DebtDetail } from './debt-detail';
-import { DebtsService } from '../../services/debts';
 import { AuthService } from '../../../auth/services/auth';
 import { debtsMock, currentUserMock } from '../../mocks/debtsMock';
 import type { IDebt } from '../../types/debt';
@@ -22,39 +18,13 @@ registerLocaleData(localeEs);
 describe('Given a DebtDetail component', () => {
   let component: DebtDetail;
   let fixture: ComponentFixture<DebtDetail>;
-  let debtsService: {
-    deleteDebt: ReturnType<typeof vi.fn>;
-    markDebtAsPaid: ReturnType<typeof vi.fn>;
-  };
-  let router: { navigate: ReturnType<typeof vi.fn> };
-  let dialog: { open: ReturnType<typeof vi.fn> };
-  let reloadSpy: ReturnType<typeof vi.fn>;
 
   const mockDebt: IDebt = debtsMock[0];
 
   beforeEach(async () => {
-    reloadSpy = vi.fn();
-    Object.defineProperty(window, 'location', {
-      value: { reload: reloadSpy },
-      writable: true,
-    });
-
-    const debtsServiceMock = {
-      deleteDebt: vi.fn(),
-      markDebtAsPaid: vi.fn(),
-    };
-
     const authServiceMock = {
       currentUser: signal<User | null>(currentUserMock),
       currentUserId: currentUserMock._id,
-    };
-
-    const routerMock = {
-      navigate: vi.fn(),
-    };
-
-    const dialogMock = {
-      open: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
@@ -64,19 +34,12 @@ describe('Given a DebtDetail component', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: DebtsService, useValue: debtsServiceMock },
         { provide: AuthService, useValue: authServiceMock },
-        { provide: Router, useValue: routerMock },
-        { provide: MatDialog, useValue: dialogMock },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DebtDetail);
     component = fixture.componentInstance;
-    debtsService = TestBed.inject(DebtsService) as unknown as typeof debtsServiceMock;
-    router = TestBed.inject(Router) as unknown as typeof routerMock;
-    dialog = TestBed.inject(MatDialog) as unknown as typeof dialogMock;
-
     component.debt = mockDebt;
     fixture.detectChanges();
   });
@@ -184,102 +147,36 @@ describe('Given a DebtDetail component', () => {
     });
   });
 
-  describe('When edit button is triggered and onEdit is called', () => {
-    it('Should navigate to edit route', () => {
+  describe('When onEdit is called', () => {
+    it('Should emit editDebt event', () => {
+      let emitted = false;
+      component.editDebt.subscribe(() => (emitted = true));
+
       component.onEdit();
 
-      expect(router.navigate).toHaveBeenCalledWith(['/debts', mockDebt._id, 'edit']);
+      expect(emitted).toBe(true);
     });
   });
 
-  describe('When delete button is triggered and onDelete is called', () => {
-    it('Should open confirm dialog', () => {
-      const mockDialogRef = { afterClosed: (): Observable<boolean> => of(false) };
+  describe('When onDelete is called', () => {
+    it('Should emit deleteDebt event', () => {
+      let emitted = false;
+      component.deleteDebt.subscribe(() => (emitted = true));
 
-      dialog.open.mockReturnValue(mockDialogRef);
       component.onDelete();
 
-      expect(dialog.open).toHaveBeenCalledWith(expect.any(Function), {
-        data: {
-          title: 'Delete Debt',
-          message: `Are you sure you want to delete "${mockDebt.description}"?`,
-          confirmText: 'Delete',
-          cancelText: 'Cancel',
-        },
-      });
-    });
-
-    it('Should delete debt and navigate when confirmed', () => {
-      const mockDialogRef = { afterClosed: (): Observable<boolean> => of(true) };
-
-      dialog.open.mockReturnValue(mockDialogRef);
-      debtsService.deleteDebt.mockReturnValue(of(void 0));
-      component.onDelete();
-
-      expect(debtsService.deleteDebt).toHaveBeenCalledWith(mockDebt._id);
-      expect(router.navigate).toHaveBeenCalledWith(['/']);
-    });
-
-    it('Should not delete debt when cancelled', () => {
-      const mockDialogRef = { afterClosed: (): Observable<boolean> => of(false) };
-
-      dialog.open.mockReturnValue(mockDialogRef);
-      component.onDelete();
-
-      expect(debtsService.deleteDebt).not.toHaveBeenCalled();
+      expect(emitted).toBe(true);
     });
   });
 
-  describe('When mark as paid button is triggered and onMarkAsPaid is called', () => {
-    it('Should open confirm dialog', () => {
-      const mockDialogRef = { afterClosed: (): Observable<boolean> => of(false) };
-
-      dialog.open.mockReturnValue(mockDialogRef);
-      component.onMarkAsPaid();
-
-      expect(dialog.open).toHaveBeenCalledWith(expect.any(Function), {
-        data: {
-          title: 'Mark as Paid',
-          message: `Mark "${mockDebt.description}" as paid?`,
-          confirmText: 'Mark as Paid',
-          cancelText: 'Cancel',
-        },
-      });
-    });
-
-    it('Should mark debt as paid and reload when confirmed', () => {
-      vi.useFakeTimers();
-
-      const mockDialogRef = { afterClosed: (): Observable<boolean> => of(true) };
-
-      dialog.open.mockReturnValue(mockDialogRef);
-      debtsService.markDebtAsPaid.mockReturnValue(of(void 0));
-
-      // prevent confetti from running
-      vi.spyOn(component, 'onMarkAsPaid').mockImplementation(() => {
-        debtsService.markDebtAsPaid(mockDebt._id).subscribe({
-          next: () => {
-            setTimeout(() => reloadSpy(), 1500);
-          },
-        });
-      });
+  describe('When onMarkAsPaid is called', () => {
+    it('Should emit markAsPaid event', () => {
+      let emitted = false;
+      component.markAsPaid.subscribe(() => (emitted = true));
 
       component.onMarkAsPaid();
-      vi.advanceTimersByTime(1500);
 
-      expect(debtsService.markDebtAsPaid).toHaveBeenCalledWith(mockDebt._id);
-      expect(reloadSpy).toHaveBeenCalled();
-
-      vi.useRealTimers();
-    });
-
-    it('Should not mark as paid when cancelled', () => {
-      const mockDialogRef = { afterClosed: (): Observable<boolean> => of(false) };
-
-      dialog.open.mockReturnValue(mockDialogRef);
-      component.onMarkAsPaid();
-
-      expect(debtsService.markDebtAsPaid).not.toHaveBeenCalled();
+      expect(emitted).toBe(true);
     });
   });
 });

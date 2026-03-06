@@ -98,3 +98,23 @@ body {
     padding-top: var(--mat-toolbar-mobile-height);
   }
 }
+
+.snackbar--error {
+  .mdc-snackbar__surface {
+    background-color: #93000a !important;
+    color: #fff !important;
+  }
+}
+
+.snackbar--success,
+.snackbar--error {
+  .mdc-snackbar__surface {
+    max-width: 300px !important;
+    min-width: 200px !important;
+
+    @media (max-width: 768px) {
+      max-width: 250px !important;
+      min-width: 200px !important;
+    }
+  }
+}
