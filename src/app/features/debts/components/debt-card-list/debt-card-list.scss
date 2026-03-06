@@ -10,6 +10,10 @@
   }
 }
 
+.mdc-list-item {
+  text-transform: capitalize;
+}
+
 .debt-list {
   display: flex;
   flex-direction: column;

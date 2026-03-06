@@ -14,6 +14,7 @@ import { DebtCard } from '../debt-card/debt-card';
 import { DebtsService } from '../../services/debts';
 import { AuthService } from '../../../auth/services/auth';
 import { ConfirmDialog } from 'src/app/shared/components/confirm-dialog/confirm-dialog/confirm-dialog';
+import { SnackbarService } from 'src/app/core/services/snackbar';
 export interface DebtColumns {
   unpaid: IDebt[];
   paid: IDebt[];
@@ -49,7 +50,7 @@ export class DebtCardList {
   private authService = inject(AuthService);
   private breakpointObserver = inject(BreakpointObserver);
   private dialog = inject(MatDialog);
-
+  private snackbar = inject(SnackbarService);
   private currentUserId = computed(() => this.authService.currentUser()?._id ?? null);
 
   isDesktop$: Observable<boolean> = this.breakpointObserver
@@ -225,8 +226,11 @@ export class DebtCardList {
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed) {
         this.debtsService.deleteAllPaidDebts(this.mode).subscribe({
-          next: () => window.location.reload(),
-          error: (error) => console.error('Error deleting paid debts:', error),
+          next: () => {
+            this.snackbar.success('All paid debts deleted successfully!');
+            window.location.reload();
+          },
+          error: () => this.snackbar.error('Could not delete paid debts.'),
         });
       }
     });
