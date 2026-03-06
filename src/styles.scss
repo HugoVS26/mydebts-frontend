@@ -99,16 +99,22 @@ body {
   }
 }
 
-.snackbar--success {
+.snackbar--error {
   .mdc-snackbar__surface {
-    background-color: var(--mat-sys-error-container) !important;
+    background-color: #93000a !important;
     color: #fff !important;
   }
 }
 
+.snackbar--success,
 .snackbar--error {
   .mdc-snackbar__surface {
-    background-color: var(--mat-sys-error-container) !important;
-    color: #fff !important;
+    max-width: 300px !important;
+    min-width: 200px !important;
+
+    @media (max-width: 768px) {
+      max-width: 250px !important;
+      min-width: 200px !important;
+    }
   }
 }

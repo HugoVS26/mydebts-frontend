@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import type { MatSnackBarHorizontalPosition } from '@angular/material/snack-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { Snackbar } from 'src/app/shared/components/snackbar/snackbar';
 
 @Injectable({ providedIn: 'root' })
 export class SnackbarService {
@@ -13,7 +14,8 @@ export class SnackbarService {
   }
 
   success(message: string): void {
-    this.snackBar.open(message, 'Close', {
+    this.snackBar.openFromComponent(Snackbar, {
+      data: { message, type: 'success' },
       duration: 4000,
       panelClass: ['snackbar--success'],
       horizontalPosition: this.horizontalPosition,
@@ -22,7 +24,8 @@ export class SnackbarService {
   }
 
   error(message: string): void {
-    this.snackBar.open(message, 'Close', {
+    this.snackBar.openFromComponent(Snackbar, {
+      data: { message, type: 'error' },
       duration: 6000,
       panelClass: ['snackbar--error'],
       horizontalPosition: this.horizontalPosition,
