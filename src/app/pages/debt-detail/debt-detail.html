@@ -1,6 +1,6 @@
 <app-navbar></app-navbar>
 <div class="debt-detail-page">
   @if (debt()) {
-  <app-debt-detail [debt]="debt()!" />
+  <app-debt-detail [debt]="debt()!" (editDebt)="onEdit()" (deleteDebt)="onDelete()" (markAsPaid)="onMarkAsPaid()" />
   }
 </div>

@@ -4,14 +4,15 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ActivatedRoute, provideRouter, Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
 
+import type { IDebt } from 'src/app/features/debts/types/debt';
 import { DebtDetailPage } from './debt-detail';
 import { DebtsService } from 'src/app/features/debts/services/debts';
 import { debtsMock } from 'src/app/features/debts/mocks/debtsMock';
-import type { IDebt } from 'src/app/features/debts/types/debt';
-import { of, throwError } from 'rxjs';
+import { SnackbarService } from 'src/app/core/services/snackbar';
 
-describe('DebtDetail', () => {
+describe('Given a DebtDetail page', () => {
   let component: DebtDetailPage;
   let fixture: ComponentFixture<DebtDetailPage>;
   let debtsService: { getDebtById: ReturnType<typeof vi.fn> };
@@ -48,6 +49,7 @@ describe('DebtDetail', () => {
         { provide: DebtsService, useValue: debtsServiceMock },
         { provide: Router, useValue: routerMock },
         { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: SnackbarService, useValue: { success: vi.fn(), error: vi.fn() } },
       ],
     }).compileComponents();
 
@@ -76,19 +78,16 @@ describe('DebtDetail', () => {
     });
 
     it('Should navigate to home when debtId is invalid or there is an error laoding its data', () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
+      const snackbar = TestBed.inject(SnackbarService);
+      const snackbarErrorSpy = vi.spyOn(snackbar, 'error');
 
       activatedRoute.snapshot.paramMap.get.mockReturnValue(mockDebtId);
-      debtsService.getDebtById.mockReturnValue(
-        throwError(() => {
-          new Error('Could not load debt');
-        }),
-      );
+      debtsService.getDebtById.mockReturnValue(throwError(() => new Error('Could not load debt')));
 
       component.ngOnInit();
 
       expect(debtsService.getDebtById).toHaveBeenCalledWith(mockDebtId);
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      expect(snackbarErrorSpy).toHaveBeenCalled();
       expect(router.navigate).toHaveBeenCalledWith(['/']);
     });
 
