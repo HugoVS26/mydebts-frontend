@@ -6,12 +6,13 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, Router, ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 
+import type { IDebtCreate, IDebtUpdate } from 'src/app/features/debts/types/debt';
 import { DebtFormPage } from './debt-form';
 import { DebtsService } from 'src/app/features/debts/services/debts';
 import { createDebtMock } from 'src/app/features/debts/mocks/debtsMock';
-import type { IDebtCreate, IDebtUpdate } from 'src/app/features/debts/types/debt';
+import { SnackbarService } from 'src/app/core/services/snackbar';
 
-describe('DebtForm', () => {
+describe('Given a DebtForm page', () => {
   let component: DebtFormPage;
   let fixture: ComponentFixture<DebtFormPage>;
   let debtsService: DebtsService;
@@ -48,6 +49,10 @@ describe('DebtForm', () => {
           { path: '', component: DebtFormPage },
           { path: 'debts/:debtId', component: DebtFormPage },
         ]),
+        {
+          provide: SnackbarService,
+          useValue: { success: vi.fn(), error: vi.fn() },
+        },
       ],
     }).compileComponents();
 
