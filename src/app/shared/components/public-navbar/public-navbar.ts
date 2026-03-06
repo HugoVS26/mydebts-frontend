@@ -1,4 +1,3 @@
-import type { OnInit } from '@angular/core';
 import {
   CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectionStrategy,
@@ -13,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink } from '@angular/router';
 import 'github-corner-element';
+import { ThemeModeService } from 'src/app/core/services/theme-mode';
 
 @Component({
   selector: 'app-public-navbar',
@@ -30,30 +30,19 @@ import 'github-corner-element';
   styleUrl: './public-navbar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PublicNavbar implements OnInit {
+export class PublicNavbar {
   private router = inject(Router);
+  private themeService = inject(ThemeModeService);
 
-  isLightMode = signal(false);
+  readonly isLightMode = this.themeService.isLightMode;
   isMenuOpen = signal(false);
-
-  ngOnInit(): void {
-    this.isLightMode.set(document.documentElement.classList.contains('light-theme'));
-  }
 
   isActive(path: string): boolean {
     return this.router.url.startsWith(path);
   }
 
   toggleTheme(): void {
-    this.isLightMode.update((light) => !light);
-
-    if (this.isLightMode()) {
-      document.documentElement.classList.remove('dark-theme');
-      document.documentElement.classList.add('light-theme');
-    } else {
-      document.documentElement.classList.remove('light-theme');
-      document.documentElement.classList.add('dark-theme');
-    }
+    this.themeService.toggle();
   }
 
   toggleMenu(): void {

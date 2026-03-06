@@ -1,18 +1,34 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 
 import { PublicNavbar } from './public-navbar';
-import { provideRouter } from '@angular/router';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { ThemeModeService } from 'src/app/core/services/theme-mode';
 
-describe('PublicNavbar', () => {
+describe('Given a PublicNavbar component', () => {
   let component: PublicNavbar;
   let fixture: ComponentFixture<PublicNavbar>;
+  let themeService: {
+    toggle: ReturnType<typeof vi.fn>;
+    isLightMode: ReturnType<typeof signal<boolean>>;
+  };
 
   beforeEach(async () => {
+    const isLightModeSignal = signal(false);
+
+    themeService = {
+      toggle: vi.fn().mockImplementation(() => isLightModeSignal.update((v) => !v)),
+      isLightMode: isLightModeSignal,
+    };
+
     await TestBed.configureTestingModule({
       imports: [PublicNavbar],
-      providers: [provideRouter([]), provideZonelessChangeDetection()],
+      providers: [
+        provideRouter([]),
+        provideZonelessChangeDetection(),
+        { provide: ThemeModeService, useValue: themeService },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PublicNavbar);
@@ -25,43 +41,33 @@ describe('PublicNavbar', () => {
       expect(component).toBeTruthy();
     });
 
-    it('Then it should read theme mode', () => {
+    it('Should read theme mode from service', () => {
       expect(component.isLightMode()).toBeDefined();
     });
   });
 
   describe('When toggling theme', () => {
-    it('Then it should switch from light to dark mode', () => {
-      component.isLightMode.set(true);
+    it('Should switch from dark to light mode', () => {
+      themeService.isLightMode.set(false);
 
       component.toggleTheme();
 
-      expect(component.isLightMode()).toBe(false);
-      expect(document.documentElement.classList.contains('dark-theme')).toBe(true);
-      expect(document.documentElement.classList.contains('light-theme')).toBe(false);
-    });
-
-    it('Then it should switch from dark to light mode', () => {
-      component.isLightMode.set(false);
-
-      component.toggleTheme();
-
+      expect(themeService.toggle).toHaveBeenCalled();
       expect(component.isLightMode()).toBe(true);
-      expect(document.documentElement.classList.contains('light-theme')).toBe(true);
-      expect(document.documentElement.classList.contains('dark-theme')).toBe(false);
     });
 
-    it('Then it should update document classes correctly', () => {
-      component.isLightMode.set(true);
+    it('Should switch from light to dark mode', () => {
+      themeService.isLightMode.set(true);
 
       component.toggleTheme();
 
-      expect(document.documentElement.classList.contains('dark-theme')).toBe(true);
+      expect(themeService.toggle).toHaveBeenCalled();
+      expect(component.isLightMode()).toBe(false);
     });
   });
 
   describe('When clicking on menu', () => {
-    it('Then it should open menu when closed', () => {
+    it('Should open menu when closed', () => {
       component.isMenuOpen.set(false);
 
       component.toggleMenu();
@@ -69,7 +75,7 @@ describe('PublicNavbar', () => {
       expect(component.isMenuOpen()).toBe(true);
     });
 
-    it('Then it should close menu when open', () => {
+    it('Should close menu when open', () => {
       component.isMenuOpen.set(true);
 
       component.toggleMenu();
@@ -77,7 +83,7 @@ describe('PublicNavbar', () => {
       expect(component.isMenuOpen()).toBe(false);
     });
 
-    it('Then it should set menu state to closed', () => {
+    it('Should set menu state to closed', () => {
       component.isMenuOpen.set(true);
 
       component.closeMenu();
@@ -85,7 +91,7 @@ describe('PublicNavbar', () => {
       expect(component.isMenuOpen()).toBe(false);
     });
 
-    it('Then it should keep menu closed if already closed', () => {
+    it('Should keep menu closed if already closed', () => {
       component.isMenuOpen.set(false);
 
       component.closeMenu();

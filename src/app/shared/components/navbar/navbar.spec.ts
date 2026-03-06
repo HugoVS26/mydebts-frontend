@@ -1,16 +1,29 @@
 import type { ComponentFixture } from '@angular/core/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+
 import { Navbar } from './navbar';
+import { ThemeModeService } from 'src/app/core/services/theme-mode';
 
 describe('Given a Navbar component', () => {
   let component: Navbar;
   let fixture: ComponentFixture<Navbar>;
+  let themeService: {
+    toggle: ReturnType<typeof vi.fn>;
+    isLightMode: ReturnType<typeof signal<boolean>>;
+  };
 
   beforeEach(async () => {
+    const isLightModeSignal = signal(false);
+
+    themeService = {
+      toggle: vi.fn().mockImplementation(() => isLightModeSignal.update((v) => !v)),
+      isLightMode: isLightModeSignal,
+    };
+
     await TestBed.configureTestingModule({
       imports: [Navbar],
       providers: [
@@ -18,6 +31,7 @@ describe('Given a Navbar component', () => {
         provideZonelessChangeDetection(),
         provideHttpClient(),
         provideHttpClientTesting(),
+        { provide: ThemeModeService, useValue: themeService },
       ],
     }).compileComponents();
 
@@ -31,68 +45,46 @@ describe('Given a Navbar component', () => {
       expect(component).toBeTruthy();
     });
 
-    it('Then it should have navigation links defined', () => {
+    it('Should have navigation links defined', () => {
       expect(component.navLinks).toHaveLength(2);
       expect(component.navLinks[0]).toEqual({ path: '/debts', label: 'Debts' });
       expect(component.navLinks[1]).toEqual({ path: '/debts/new', label: 'New Debt' });
     });
 
-    it('Then it should read theme mode', () => {
+    it('Should read theme mode from service', () => {
       expect(component.isLightMode()).toBeDefined();
     });
   });
 
   describe('When checking if route is active', () => {
-    it('Then it should return true for matching route', () => {
+    it('Should return boolean for matching route', () => {
       const result = component.isActive('/debts');
       expect(typeof result).toBe('boolean');
     });
   });
 
   describe('When toggling theme', () => {
-    it('Then it should switch from light to dark mode', () => {
-      component.isLightMode.set(true);
-      document.documentElement.classList.add('light-theme');
+    it('Should switch from dark to light mode', () => {
+      themeService.isLightMode.set(false);
 
       component.toggleTheme();
 
-      expect(component.isLightMode()).toBe(false);
-      expect(document.documentElement.classList.contains('dark-theme')).toBe(true);
-      expect(document.documentElement.classList.contains('light-theme')).toBe(false);
-
-      // Cleanup
-      document.documentElement.classList.remove('dark-theme');
-    });
-
-    it('Then it should switch from dark to light mode', () => {
-      component.isLightMode.set(false);
-      document.documentElement.classList.add('dark-theme');
-
-      component.toggleTheme();
-
+      expect(themeService.toggle).toHaveBeenCalled();
       expect(component.isLightMode()).toBe(true);
-      expect(document.documentElement.classList.contains('light-theme')).toBe(true);
-      expect(document.documentElement.classList.contains('dark-theme')).toBe(false);
-
-      // Cleanup
-      document.documentElement.classList.remove('light-theme');
     });
 
-    it('Then it should update document classes correctly', () => {
-      component.isLightMode.set(true);
-      document.documentElement.classList.add('light-theme');
+    it('Should switch from light to dark mode', () => {
+      themeService.isLightMode.set(true);
 
       component.toggleTheme();
 
-      expect(document.documentElement.classList.contains('dark-theme')).toBe(true);
-
-      // Cleanup
-      document.documentElement.classList.remove('dark-theme');
+      expect(themeService.toggle).toHaveBeenCalled();
+      expect(component.isLightMode()).toBe(false);
     });
   });
 
   describe('When clicking on menu', () => {
-    it('Then it should open menu when closed', () => {
+    it('Should open menu when closed', () => {
       component.isMenuOpen.set(false);
 
       component.toggleMenu();
@@ -100,7 +92,7 @@ describe('Given a Navbar component', () => {
       expect(component.isMenuOpen()).toBe(true);
     });
 
-    it('Then it should close menu when open', () => {
+    it('Should close menu when open', () => {
       component.isMenuOpen.set(true);
 
       component.toggleMenu();
@@ -108,7 +100,7 @@ describe('Given a Navbar component', () => {
       expect(component.isMenuOpen()).toBe(false);
     });
 
-    it('Then it should set menu state to closed', () => {
+    it('Should set menu state to closed', () => {
       component.isMenuOpen.set(true);
 
       component.closeMenu();
@@ -116,7 +108,7 @@ describe('Given a Navbar component', () => {
       expect(component.isMenuOpen()).toBe(false);
     });
 
-    it('Then it should keep menu closed if already closed', () => {
+    it('Should keep menu closed if already closed', () => {
       component.isMenuOpen.set(false);
 
       component.closeMenu();

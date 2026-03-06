@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import type { OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -7,6 +6,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 
 import { AuthService } from 'src/app/features/auth/services/auth';
+import { ThemeModeService } from 'src/app/core/services/theme-mode';
 
 @Component({
   selector: 'app-navbar',
@@ -16,11 +16,12 @@ import { AuthService } from 'src/app/features/auth/services/auth';
   styleUrl: './navbar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Navbar implements OnInit {
+export class Navbar {
   private router = inject(Router);
   private authService = inject(AuthService);
+  private themeService = inject(ThemeModeService);
+  readonly isLightMode = this.themeService.isLightMode;
 
-  isLightMode = signal(true);
   isMenuOpen = signal(false);
 
   readonly navLinks = [
@@ -28,24 +29,12 @@ export class Navbar implements OnInit {
     { path: '/debts/new', label: 'New Debt' },
   ];
 
-  ngOnInit(): void {
-    this.isLightMode.set(document.documentElement.classList.contains('light-theme'));
-  }
-
   isActive(path: string): boolean {
     return this.router.url.startsWith(path);
   }
 
   toggleTheme(): void {
-    this.isLightMode.update((light) => !light);
-
-    if (this.isLightMode()) {
-      document.documentElement.classList.remove('dark-theme');
-      document.documentElement.classList.add('light-theme');
-    } else {
-      document.documentElement.classList.remove('light-theme');
-      document.documentElement.classList.add('dark-theme');
-    }
+    this.themeService.toggle();
   }
 
   toggleMenu(): void {
