@@ -1,0 +1,41 @@
+<app-public-navbar />
+
+<main class="shared-debt-page">
+  @if (debt()) {
+
+  <app-debt-detail [debt]="debt()!" [readonly]="true" />
+
+  <div class="shared-debt-page__banner">
+    <p class="shared-debt-page__banner-text">
+      <mat-icon class="shared-debt-page__banner-icon">share</mat-icon>
+      This debt was shared with you via MyDebts
+    </p>
+    <p class="shared-debt-page__cta">
+      Want to track your own debts?
+      <a routerLink="/home">Try MyDebts for free</a>
+    </p>
+  </div>
+
+  } @else if (expired()) {
+
+  <div class="shared-debt-page__container">
+    <div class="shared-debt-page__expired-state">
+      <mat-icon class="shared-debt-page__expired-icon">link_off</mat-icon>
+      <h2 class="shared-debt-page__expired-title">Link expired or invalid</h2>
+      <p class="shared-debt-page__expired-subtitle">
+        This share link is no longer available. <br> Ask the sender for a new one.
+      </p>
+      <a routerLink="/home" mat-stroked-button class="shared-debt-page__expired-action">
+        Go to MyDebts
+      </a>
+    </div>
+  </div>
+
+  } @else {
+
+  <div class="shared-debt-page__loading">
+    <mat-progress-spinner mode="indeterminate" diameter="48" />
+  </div>
+  }
+
+</main>

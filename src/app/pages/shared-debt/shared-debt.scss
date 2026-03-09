@@ -1,0 +1,96 @@
+@use '../../styles/mixins' as mix;
+@use '../../styles/variables' as var;
+
+.shared-debt-page {
+  @include mix.page-container-narrow;
+  padding: 0 1rem;
+
+  &__banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    margin: 4rem auto 0;
+    max-width: 350px;
+    border-radius: 8px;
+    background-color: color-mix(in srgb, currentColor 5%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  }
+
+  &__banner-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  &__banner-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  &__cta {
+    text-align: center;
+    font-size: 14px;
+    margin: 0;
+
+    a {
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
+  &__container,
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100dvh - var.$toolbar-standard-height);
+
+    @media (max-width: var.$breakpoint-mobile) {
+      height: calc(100dvh - var.$toolbar-mobile-height);
+    }
+  }
+
+  &__expired-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: var.$spacing-unit;
+    padding: var.$spacing-unit;
+    max-width: 400px;
+  }
+
+  &__expired-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    opacity: 0.4;
+  }
+
+  &__expired-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  &__expired-subtitle {
+    margin: 0;
+    opacity: 0.6;
+    max-width: 340px;
+  }
+
+  &__expired-action {
+    margin-top: 0.5rem;
+  }
+}
