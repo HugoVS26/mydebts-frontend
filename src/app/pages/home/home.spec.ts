@@ -9,7 +9,7 @@ import { HomePage } from './home';
 
 registerLocaleData(localeEs);
 
-describe('Given a Home page', () => {
+describe('Given a HomePage component', () => {
   let component: HomePage;
   let fixture: ComponentFixture<HomePage>;
 

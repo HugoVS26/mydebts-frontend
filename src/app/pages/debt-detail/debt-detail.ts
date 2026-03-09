@@ -98,4 +98,15 @@ export class DebtDetailPage implements OnInit {
       }
     });
   }
+
+  onShare(): void {
+    this.debtsService.createShareLink(this.debtId!).subscribe({
+      next: ({ token }) => {
+        const url = `${window.location.origin}/share/${token}`;
+        navigator.clipboard.writeText(url);
+        this.snackbar.success('Share link copied to clipboard!');
+      },
+      error: () => this.snackbar.error('Could not generate share link.'),
+    });
+  }
 }

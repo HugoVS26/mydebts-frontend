@@ -34,6 +34,10 @@ export interface IDebtFilter {
   sortOrder?: SortOrder;
 }
 
+export interface IShareLinkResponse {
+  token: string;
+}
+
 export type SortField = 'amount' | 'debtDate' | 'dueDate';
 
 export type SortOrder = 'asc' | 'desc';
