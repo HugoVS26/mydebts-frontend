@@ -6,12 +6,16 @@
   <mat-card class="debt-detail__data">
     <mat-card-header class="debt-detail__header">
       <div class="debt-detail__header-content">
-        <mat-card-title class="debt-detail__title">{{ debt.description | slice:0:30 }}{{debt.description.length > 30 ?
-          '...'
-          : '' }}</mat-card-title>
+        <mat-card-title class="debt-detail__title">
+          {{ debt.description | slice:0:30 }}{{ debt.description.length > 30 ? '...' : '' }}
+        </mat-card-title>
       </div>
 
+      @if (!readonly) {
       <div class="debt-detail__actions force-light-theme">
+        <button mat-icon-button (click)="onShare()" aria-label="Share debt">
+          <mat-icon>share</mat-icon>
+        </button>
         <button mat-icon-button (click)="onEdit()" aria-label="Edit debt">
           <mat-icon>edit</mat-icon>
         </button>
@@ -19,14 +23,14 @@
           <mat-icon>delete</mat-icon>
         </button>
       </div>
+      }
     </mat-card-header>
 
     <mat-card-content class="debt-detail__content">
       <div class="debt-detail__amount-section">
-        <h2 class="debt-detail__amount">{{ debt.amount |
-          number:'1.2-2':'es-ES' }} €</h2>
+        <h2 class="debt-detail__amount">{{ debt.amount | number:'1.2-2':'es-ES' }} €</h2>
         <div class="debt-detail__status">
-          <mat-icon class="debt-detail__status-icon" fontSet="{{statusInfo.fontSet}}">
+          <mat-icon class="debt-detail__status-icon" fontSet="{{ statusInfo.fontSet }}">
             {{ statusInfo.icon }}
           </mat-icon>
           <span class="debt-detail__status-text">{{ statusInfo.label }}</span>
@@ -39,11 +43,25 @@
         <li class="debt-detail__info-item">
           <div class="debt-card__detail">
             @if (mode() === 'creditor') {
-            <span><b class="debt-detail__counterparty">{{counterparty.displayName}}</b> owes you <b>{{ debt.amount |
-                number:'1.2-2':'es-ES' }} €</b> for {{debt.description}}</span>
-            } @else
-            {<span>You owe <b class="debt-detail__counterparty">{{counterparty.displayName}} </b> <b>{{ debt.amount |
-                number:'1.2-2':'es-ES' }} €</b> for {{debt.description}}</span>}
+            <span>
+              <b class="debt-detail__counterparty">{{ counterparty.displayName }} </b>
+              owes you <b>{{ debt.amount | number:'1.2-2':'es-ES' }} €</b>
+              for {{ debt.description }}
+            </span>
+            } @else if (mode() === 'debtor') {
+            <span>
+              You owe <b class="debt-detail__counterparty">{{ counterparty.displayName }} </b>
+              <b>{{ debt.amount | number:'1.2-2':'es-ES' }} €</b>
+              for {{ debt.description }}
+            </span>
+            } @else {
+            <span>
+              <b class="debt-detail__counterparty">{{ debtorName }}</b>
+              owes <b class="debt-detail__counterparty">{{ creditorName }} </b>
+              <b>{{ debt.amount | number:'1.2-2':'es-ES' }} €</b>
+              for {{ debt.description }}
+            </span>
+            }
           </div>
         </li>
 
@@ -61,9 +79,9 @@
       </ul>
     </mat-card-content>
 
-    @if (canMarkAsPaid) {
+    @if (canMarkAsPaid && !readonly) {
     <mat-card-actions class="debt-detail__footer">
-      <button matButton="outlined" class=" debt-detail__paid-button" (click)="onMarkAsPaid()"
+      <button matButton="outlined" class="debt-detail__paid-button" (click)="onMarkAsPaid()"
         aria-label="Mark debt as paid">
         <mat-icon class="debt-detail__paid-icon">check</mat-icon>
         Paid
