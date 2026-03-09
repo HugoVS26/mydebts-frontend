@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import type { Observable } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-import type { IDebt, IDebtCreate, IDebtUpdate } from '../types/debt';
+import type { IDebt, IDebtCreate, IDebtUpdate, IShareLinkResponse } from '../types/debt';
 
 interface MultipleDebtsResponse {
   message: string;
@@ -55,5 +55,9 @@ export class DebtsService {
     return this.http.delete<{ message: string }>(`${this.apiUrl}/paid`, {
       params: { mode },
     });
+  }
+
+  createShareLink(debtId: string): Observable<IShareLinkResponse> {
+    return this.http.post<IShareLinkResponse>(`${this.apiUrl}/${debtId}/share`, {});
   }
 }
