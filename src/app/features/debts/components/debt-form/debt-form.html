@@ -8,7 +8,7 @@
 
       @if (mode === 'create') {
       <div class="debt-form__mode-toggle">
-        <mat-button-toggle-group [value]="debtMode()" (change)="debtMode.set($event.value)" aria-label="Debt mode">
+        <mat-button-toggle-group [value]="debtMode()" (change)="onDebtModeChange($event.value)" aria-label="Debt mode">
           <mat-button-toggle value="creditor">Someone owes me</mat-button-toggle>
           <mat-button-toggle value="debtor">I owe someone</mat-button-toggle>
         </mat-button-toggle-group>
@@ -26,7 +26,13 @@
           <mat-error>{{ counterpartyLabel }} is required</mat-error>
           }
           @if (form.get('counterparty')?.hasError('minlength')) {
-          <mat-error>{{ counterpartyLabel }} must be at least 2 characters</mat-error>
+          <mat-error>{{ counterpartyLabel }} must be at least 1 character</mat-error>
+          }
+          @if (form.get('counterparty')?.hasError('maxlength')) {
+          <mat-error>{{ counterpartyLabel }} must be under 50 characters</mat-error>
+          }
+          @if (form.get('counterparty')?.hasError('pattern')) {
+          <mat-error>Only letters, spaces, hyphens, and apostrophes allowed</mat-error>
           }
         </mat-form-field>
         }
@@ -38,18 +44,25 @@
           <mat-error>Description is required</mat-error>
           }
           @if (form.get('description')?.hasError('minlength')) {
-          <mat-error>Description must be at least 3 characters</mat-error>
+          <mat-error>Description must be at least 1 character</mat-error>
+          }
+          @if (form.get('description')?.hasError('maxlength')) {
+          <mat-error>Description must be under 100 characters</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Amount</mat-label>
-          <input matInput type="number" formControlName="amount" placeholder="0.00" step="1" />
+          <input matInput type="text" inputmode="decimal" formControlName="amount" placeholder="0.00"
+            (input)="onAmountInput($event)" />
           @if (form.get('amount')?.hasError('required')) {
           <mat-error>Amount is required</mat-error>
           }
           @if (form.get('amount')?.hasError('min')) {
-          <mat-error>Amount must be greater than 0</mat-error>
+          <mat-error>Amount must be at least 0.01</mat-error>
+          }
+          @if (form.get('amount')?.hasError('max')) {
+          <mat-error>Amount must be less than 10 million</mat-error>
           }
         </mat-form-field>
 
@@ -59,6 +72,9 @@
           <input matInput [matDatepicker]="debtDatePicker" formControlName="debtDate" />
           <mat-datepicker-toggle matIconSuffix [for]="debtDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #debtDatePicker></mat-datepicker>
+          @if (form.get('debtDate')?.hasError('futureDate')) {
+          <mat-error>Debt date cannot be in the future</mat-error>
+          }
         </mat-form-field>
         }
 
