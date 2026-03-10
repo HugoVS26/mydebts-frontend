@@ -6,7 +6,7 @@
 
   @media (min-width: 1024px) {
     align-items: stretch;
-    padding: 0;
+    padding: 0 2rem;
   }
 }
 
@@ -17,7 +17,7 @@
 .debt-list {
   display: flex;
   flex-direction: column;
-  gap: 4rem;
+  gap: 3rem;
   align-items: center;
   width: 100%;
 
@@ -25,11 +25,11 @@
     flex-direction: row;
     justify-content: center;
     gap: 3rem;
-    align-items: stretch;
+    align-items: center;
   }
 
   &__header {
-    padding-top: 20px;
+    padding-top: 1rem;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -87,16 +87,24 @@
     gap: 1rem;
     width: 100%;
     max-width: 300px;
-    @media (min-width: 1024px) {
-      &:not(:last-child) {
-        border-right: 1px solid var(--mat-sys-outline, rgba(0, 0, 0, 0.12));
-        padding-right: 3rem;
-      }
+    min-height: 300px;
+
+    @media (max-width: 1024px) {
+      gap: 0;
+      min-height: 100px;
     }
 
-    &:has(.debt-list__empty) {
-      @media (max-width: 1023px) {
-        display: none;
+    &:not(:last-child) {
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--mat-sys-outline, rgba(0, 0, 0, 0.12));
+    }
+
+    @media (min-width: 1024px) {
+      &:not(:last-child) {
+        border-bottom: none;
+        border-right: 1px solid var(--mat-sys-outline, rgba(0, 0, 0, 0.12));
+        padding-bottom: 0;
+        padding-right: 3rem;
       }
     }
   }
@@ -135,13 +143,13 @@
   }
 
   &__column--overdue {
-    order: 1;
+    order: 2;
     @media (min-width: 1024px) {
       order: 2;
     }
   }
   &__column--unpaid {
-    order: 2;
+    order: 1;
     @media (min-width: 1024px) {
       order: 1;
     }
@@ -153,11 +161,9 @@
     }
   }
 
-  &__column {
-    &:has(.debt-list__empty) {
-      @media (max-width: 1023px) {
-        display: none;
-      }
+  @media (max-width: 1024px) {
+    &__column--empty {
+      display: none;
     }
   }
 
@@ -167,6 +173,15 @@
     gap: 3rem;
     width: 100%;
     max-width: 300px;
+    flex: 1;
+
+    @media (max-width: 1024px) {
+      &:has(.debt-list__empty) {
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
 
     .debt-list__card-item {
       display: block;
@@ -180,20 +195,45 @@
     }
   }
 
-  &__divider {
-    width: 60%;
-    height: 1px;
-    margin-top: 2rem;
-
-    @media (min-width: 1024px) {
-      width: 1px;
-      height: auto;
-      align-self: stretch;
-      margin: 0 1.75rem;
-    }
-  }
-
   &__empty {
     text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4rem;
+
+    @media (max-width: 1024px) {
+      &__column--empty {
+        display: none;
+      }
+    }
+
+    &-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-top: -1.4rem;
+
+      @media (max-width: 1024px) {
+        margin-top: 1rem;
+      }
+    }
+
+    &-icon {
+      font-size: 84px;
+      height: 84px;
+      width: 84px;
+      font-family: 'Material Symbols Outlined' !important;
+      font-variation-settings: 'wght' 100 !important;
+      font-weight: 100 !important;
+
+      @media (max-width: 1024px) {
+        font-size: 48px;
+        height: 48px;
+        width: 48px;
+      }
+    }
   }
 }

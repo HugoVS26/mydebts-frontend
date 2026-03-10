@@ -61,9 +61,25 @@ $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
   }
 
   &__header {
+    display: flex;
+    justify-content: space-between;
     padding-bottom: 0.8em;
     padding-top: 0.8em;
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+
+    &-button {
+      background: none;
+      border: none;
+      margin-right: -1rem;
+      cursor: pointer;
+    }
+
+    &-icon {
+      color: #1f1b12;
+      font-size: 26px;
+      height: 26px;
+      width: 26px;
+    }
   }
 
   &__title {

@@ -41,7 +41,8 @@
 
 <div class="debt-list">
 
-  <div class="debt-list__column debt-list__column--overdue">
+  <div class="debt-list__column debt-list__column--overdue"
+    [class.debt-list__column--empty]="!(filteredDebts$ | async)?.['overdue']?.length">
     <h3 class="debt-list__column-title">Overdue</h3>
     <ol class="debt-list__cards">
       @for (debt of (filteredDebts$ | async)?.['overdue']; track trackByDebtId($index, debt)) {
@@ -62,14 +63,17 @@
       <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
       } @empty {
       <li class="debt-list__card-item debt-list__empty">
-        You have no unpaid debts. <br> Enjoy your day! 🎉
+        <button class="debt-list__empty-button" routerLink="/debts/new">
+          <mat-icon fontSet="material-symbols-outlined" class="debt-list__empty-icon">add</mat-icon>
+        </button>
       </li>
       }
     </ol>
   </div>
 
 
-  <div class="debt-list__column debt-list__column--paid">
+  <div class="debt-list__column debt-list__column--paid"
+    [class.debt-list__column--empty]="!(filteredDebts$ | async)?.['paid']?.length">
     <div class="debt-list__column-header">
       <h3 class="debt-list__column-title">Paid</h3>
       @if ((filteredDebts$ | async)?.['paid']?.length) {

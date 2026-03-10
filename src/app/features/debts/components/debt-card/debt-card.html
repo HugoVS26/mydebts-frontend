@@ -7,6 +7,9 @@
     <mat-card-header class="debt-card__header">
       <mat-card-title class="debt-card__title">{{ debt.description | slice:0:30 }}{{debt.description.length > 30 ? '...'
         : '' }}</mat-card-title>
+      <button class="debt-card__header-button">
+        <mat-icon class="debt-card__header-icon">chevron_right</mat-icon>
+      </button>
     </mat-card-header>
 
     <mat-card-content class="debt-card__content">
@@ -18,6 +21,12 @@
         {<span>You owe <b class="debt-card__counterparty">{{counterpartyName}} </b> <b>{{ debt.amount |
             number:'1.2-2':'es-ES' }} €</b></span>}
       </div>
+      @if (debt.dueDate){
+      <div class="debt-card__detail">
+        <span class="debt-detail__info-label"><b>Due Date: </b></span>
+        <span class="debt-detail__info-value">{{ debt.dueDate | date: 'mediumDate' }}</span>
+      </div>}
+
 
       <div class="debt-card__detail debt-card__status">
         @if (statusIcons[debt.status]) {

@@ -13,13 +13,13 @@
 
       @if (!readonly) {
       <div class="debt-detail__actions force-light-theme">
-        <button mat-icon-button (click)="onShare()" aria-label="Share debt">
+        <button mat-icon-button (click)="onShare()" aria-label="Share debt" title="Share link">
           <mat-icon>share</mat-icon>
         </button>
-        <button mat-icon-button (click)="onEdit()" aria-label="Edit debt">
+        <button mat-icon-button (click)="onEdit()" aria-label="Edit debt" title="Edit">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button (click)="onDelete()" aria-label="Delete debt">
+        <button mat-icon-button (click)="onDelete()" aria-label="Delete debt" title="Delete">
           <mat-icon>delete</mat-icon>
         </button>
       </div>
