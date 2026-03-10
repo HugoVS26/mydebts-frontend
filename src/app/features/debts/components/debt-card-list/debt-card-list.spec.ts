@@ -16,6 +16,7 @@ import { AuthService } from '../../../auth/services/auth';
 import { debtsMock, currentUserMock } from '../../mocks/debtsMock';
 import type { IDebt } from '../../types/debt';
 import type { User } from '../../../auth/types/user';
+import { DebtModeService } from '../../services/debt-mode';
 
 registerLocaleData(localeEs);
 
@@ -43,6 +44,7 @@ describe('Given a DebtList component', () => {
       providers: [
         { provide: DebtsService, useValue: debtsServiceMock },
         { provide: AuthService, useValue: authServiceMock },
+        DebtModeService,
         provideZonelessChangeDetection(),
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -148,14 +150,13 @@ describe('Given a DebtList component', () => {
 
     it('Should filter debts where current user is debtor in debtor mode', async () => {
       component.toggleMode('debtor');
+      fixture.detectChanges();
 
       const result = await firstValueFrom(component.filteredDebts$);
-
       const allDebtorDebts = [...result.unpaid, ...result.paid, ...result.overdue];
 
       allDebtorDebts.forEach((debt) => {
         const debtorId = typeof debt.debtor === 'object' ? debt.debtor._id : debt.debtor;
-
         expect(debtorId).toBe(currentUserMock._id);
       });
     });

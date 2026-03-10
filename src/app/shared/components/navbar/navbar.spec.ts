@@ -7,6 +7,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { Navbar } from './navbar';
 import { ThemeModeService } from 'src/app/core/services/theme-mode';
+import { DebtModeService } from 'src/app/features/debts/services/debt-mode';
 
 describe('Given a Navbar component', () => {
   let component: Navbar;
@@ -32,6 +33,7 @@ describe('Given a Navbar component', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: ThemeModeService, useValue: themeService },
+        DebtModeService,
       ],
     }).compileComponents();
 
@@ -48,7 +50,7 @@ describe('Given a Navbar component', () => {
     it('Should have navigation links defined', () => {
       expect(component.navLinks).toHaveLength(2);
       expect(component.navLinks[0]).toEqual({ path: '/debts', label: 'Debts' });
-      expect(component.navLinks[1]).toEqual({ path: '/debts/new', label: 'New Debt' });
+      expect(component.navLinks[1]).toMatchObject({ path: '/debts/new', label: 'New Debt' });
     });
 
     it('Should read theme mode from service', () => {

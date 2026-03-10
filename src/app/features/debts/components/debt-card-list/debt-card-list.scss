@@ -25,7 +25,7 @@
     flex-direction: row;
     justify-content: center;
     gap: 3rem;
-    align-items: center;
+    align-items: start;
   }
 
   &__header {
@@ -228,6 +228,7 @@
       font-family: 'Material Symbols Outlined' !important;
       font-variation-settings: 'wght' 100 !important;
       font-weight: 100 !important;
+      color: var(--mat-sys-inverse-surface);
 
       @media (max-width: 1024px) {
         font-size: 48px;
