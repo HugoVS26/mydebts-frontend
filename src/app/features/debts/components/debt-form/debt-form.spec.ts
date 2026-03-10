@@ -10,6 +10,7 @@ import { DebtsService } from '../../services/debts';
 import { debtMock, currentUserMock } from '../../mocks/debtsMock';
 import type { User } from 'src/app/features/auth/types/user';
 import { AuthService } from 'src/app/features/auth/services/auth';
+import { DebtModeService } from '../../services/debt-mode';
 
 describe('Given a DebtForm component', () => {
   let component: DebtForm;
@@ -30,6 +31,7 @@ describe('Given a DebtForm component', () => {
       providers: [
         DebtsService,
         { provide: AuthService, useValue: authServiceMock },
+        DebtModeService,
         provideZonelessChangeDetection(),
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -89,32 +91,75 @@ describe('Given a DebtForm component', () => {
     it('Should validate minimum amount', () => {
       const amount = component.form.get('amount');
 
-      amount?.setValue(0);
-
+      amount?.setValue('0');
       expect(amount?.hasError('min')).toBeTruthy();
 
-      amount?.setValue(0.01);
-
+      amount?.setValue('0.01');
       expect(amount?.hasError('min')).toBeFalsy();
+    });
+
+    it('Should validate maximum amount', () => {
+      const amount = component.form.get('amount');
+
+      amount?.setValue('10000001');
+      expect(amount?.hasError('max')).toBeTruthy();
+
+      amount?.setValue('10000000');
+      expect(amount?.hasError('max')).toBeFalsy();
+    });
+
+    it('Should reject non-numeric amount', () => {
+      const amount = component.form.get('amount');
+
+      amount?.setValue('abc');
+      expect(amount?.hasError('invalidAmount')).toBeTruthy();
     });
 
     it('Should validate minimum description length', () => {
       const description = component.form.get('description');
 
       description?.setValue('');
-
       expect(description?.hasError('required')).toBeTruthy();
 
       description?.setValue('A');
-
       expect(description?.hasError('minlength')).toBeFalsy();
+    });
+
+    it('Should validate maximum description length', () => {
+      const description = component.form.get('description');
+
+      description?.setValue('a'.repeat(101));
+      expect(description?.hasError('maxlength')).toBeTruthy();
+
+      description?.setValue('a'.repeat(100));
+      expect(description?.hasError('maxlength')).toBeFalsy();
+    });
+
+    it('Should validate counterparty pattern', () => {
+      const counterparty = component.form.get('counterparty');
+
+      counterparty?.setValue('John123');
+      expect(counterparty?.hasError('pattern')).toBeTruthy();
+
+      counterparty?.setValue('John Doe');
+      expect(counterparty?.hasError('pattern')).toBeFalsy();
+    });
+
+    it('Should validate maximum counterparty length', () => {
+      const counterparty = component.form.get('counterparty');
+
+      counterparty?.setValue('A'.repeat(51));
+      expect(counterparty?.hasError('maxlength')).toBeTruthy();
+
+      counterparty?.setValue('A'.repeat(50));
+      expect(counterparty?.hasError('maxlength')).toBeFalsy();
     });
 
     it('Should mark form as valid when all required fields are filled', () => {
       component.form.patchValue({
         counterparty: 'John Doe',
         description: 'Test debt',
-        amount: 100,
+        amount: '100',
       });
 
       expect(component.form.valid).toBeTruthy();
@@ -131,7 +176,7 @@ describe('Given a DebtForm component', () => {
 
     it('Should initialize the form with debt data', () => {
       expect(component.form.get('description')?.value).toBe(debtMock.description);
-      expect(component.form.get('amount')?.value).toBe(debtMock.amount);
+      expect(component.form.get('amount')?.value).toBe(debtMock.amount.toString());
 
       const formDueDate = component.form.get('dueDate')?.value as Date;
       const expectedDueDate = new Date(debtMock.dueDate);
@@ -179,10 +224,7 @@ describe('Given a DebtForm component', () => {
       const debtDate = new Date('2025-10-16');
       const dueDate = new Date('2025-10-15');
 
-      component.form.patchValue({
-        debtDate,
-        dueDate,
-      });
+      component.form.patchValue({ debtDate, dueDate });
 
       expect(component.form.get('dueDate')?.hasError('beforeDebtDate')).toBeTruthy();
     });
@@ -191,10 +233,7 @@ describe('Given a DebtForm component', () => {
       const debtDate = new Date('2025-10-16');
       const dueDate = new Date('2025-10-16');
 
-      component.form.patchValue({
-        debtDate,
-        dueDate,
-      });
+      component.form.patchValue({ debtDate, dueDate });
 
       expect(component.form.get('dueDate')?.hasError('beforeDebtDate')).toBeFalsy();
     });
@@ -212,24 +251,18 @@ describe('Given a DebtForm component', () => {
   describe('When form is on create mode and the debt mode is toggled', () => {
     it('Should change counterparty label based on debt mode', () => {
       component.debtMode.set('creditor');
-
       expect(component.counterpartyLabel).toBe('Debtor');
 
       component.debtMode.set('debtor');
-
       expect(component.counterpartyLabel).toBe('Creditor');
     });
 
     it('Should change counterparty placeholder based on debt mode', () => {
-      const counterpartyCreditorPlaceholder = 'Enter the name of who owes you';
       component.debtMode.set('creditor');
+      expect(component.counterpartyPlaceholder).toBe('Enter the name of who owes you');
 
-      expect(component.counterpartyPlaceholder).toBe(counterpartyCreditorPlaceholder);
-
-      const counterpartyDebtorPlaceholder = 'Enter the name of who you owe';
       component.debtMode.set('debtor');
-
-      expect(component.counterpartyPlaceholder).toBe(counterpartyDebtorPlaceholder);
+      expect(component.counterpartyPlaceholder).toBe('Enter the name of who you owe');
     });
   });
 
@@ -237,7 +270,7 @@ describe('Given a DebtForm component', () => {
     const validFormData = {
       counterparty: 'John Doe',
       description: 'Test debt',
-      amount: 100,
+      amount: '100',
       debtDate: new Date('2024-01-15T00:00:00.000Z'),
       dueDate: new Date('2024-02-15T00:00:00.000Z'),
     };
@@ -255,7 +288,7 @@ describe('Given a DebtForm component', () => {
           debtor: validFormData.counterparty,
           creditor: currentUserMock._id,
           description: validFormData.description,
-          amount: validFormData.amount,
+          amount: 100,
           debtDate: '2024-01-15',
           dueDate: '2024-02-15',
         }),
@@ -269,7 +302,7 @@ describe('Given a DebtForm component', () => {
       component.form.patchValue({
         counterparty: 'Jane Smith',
         description: 'Test debt',
-        amount: 200,
+        amount: '200',
         debtDate: new Date('2024-01-15'),
         dueDate: new Date('2024-02-15'),
       });
@@ -299,7 +332,7 @@ describe('Given a DebtForm component', () => {
       component.form.patchValue({
         counterparty: 'John Doe',
         description: 'Test debt',
-        amount: 100,
+        amount: '100',
       });
       component.onSubmit();
 
