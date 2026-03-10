@@ -16,7 +16,7 @@ export class SnackbarService {
   success(message: string): void {
     this.snackBar.openFromComponent(Snackbar, {
       data: { message, type: 'success' },
-      duration: 4000,
+      duration: 6000,
       panelClass: ['snackbar--success'],
       horizontalPosition: this.horizontalPosition,
       verticalPosition: 'bottom',
@@ -26,7 +26,7 @@ export class SnackbarService {
   error(message: string): void {
     this.snackBar.openFromComponent(Snackbar, {
       data: { message, type: 'error' },
-      duration: 6000,
+      duration: 8000,
       panelClass: ['snackbar--error'],
       horizontalPosition: this.horizontalPosition,
       verticalPosition: 'bottom',

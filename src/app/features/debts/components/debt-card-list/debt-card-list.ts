@@ -15,6 +15,7 @@ import { DebtsService } from '../../services/debts';
 import { AuthService } from '../../../auth/services/auth';
 import { ConfirmDialog } from 'src/app/shared/components/confirm-dialog/confirm-dialog/confirm-dialog';
 import { SnackbarService } from 'src/app/core/services/snackbar';
+import { RouterLink } from '@angular/router';
 export interface DebtColumns {
   unpaid: IDebt[];
   paid: IDebt[];
@@ -40,7 +41,15 @@ const SORT_OPTIONS = [
 @Component({
   selector: 'app-debt-card-list',
   standalone: true,
-  imports: [DebtCard, AsyncPipe, MatButtonToggleModule, MatIcon, MatDividerModule, MatSelectModule],
+  imports: [
+    DebtCard,
+    AsyncPipe,
+    MatButtonToggleModule,
+    MatIcon,
+    MatDividerModule,
+    MatSelectModule,
+    RouterLink,
+  ],
   templateUrl: './debt-card-list.html',
   styleUrls: ['./debt-card-list.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
