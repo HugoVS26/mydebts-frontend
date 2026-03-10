@@ -23,6 +23,7 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import type { IDebt, IDebtCreate, IDebtUpdate } from '../../types/debt';
 import { AuthService } from 'src/app/features/auth/services/auth';
 import { MatIcon } from '@angular/material/icon';
+import { DebtModeService } from '../../services/debt-mode';
 
 interface DebtFormValues {
   counterparty: string;
@@ -68,6 +69,9 @@ export class DebtForm implements OnInit, OnChanges {
   private formBuilder = inject(FormBuilder);
   private authService = inject(AuthService);
   private initialFormValues: Partial<DebtFormValues> = {};
+  private debtModeService = inject(DebtModeService);
+
+  private readonly namePattern = /^[a-zA-ZÀ-ÿ\u00f1\u00d1\s\-']+$/;
 
   constructor() {
     this.form = this.formBuilder.group({
@@ -76,6 +80,7 @@ export class DebtForm implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    this.debtMode.set(this.debtModeService.mode());
     this.initForm();
     this.formReady.set(true);
   }
@@ -95,19 +100,31 @@ export class DebtForm implements OnInit, OnChanges {
     const baseControls = {
       description: [
         this.initialData?.description ?? '',
-        isCreateMode ? [Validators.required, Validators.minLength(1)] : [Validators.minLength(1)],
+        isCreateMode
+          ? [Validators.required, Validators.minLength(1), Validators.maxLength(100)]
+          : [Validators.minLength(1), Validators.maxLength(100)],
       ],
       amount: [
-        this.initialData?.amount ?? null,
-        isCreateMode ? [Validators.required, Validators.min(0.01)] : [Validators.min(0.01)],
+        this.initialData?.amount?.toString() ?? null,
+        isCreateMode
+          ? [Validators.required, this.numericAmountValidator()]
+          : [this.numericAmountValidator()],
       ],
       dueDate: [this.initialData?.dueDate ? new Date(this.initialData.dueDate) : null],
     };
 
     const createModeControls = isCreateMode
       ? {
-          counterparty: ['', [Validators.required, Validators.minLength(1)]],
-          debtDate: [new Date()],
+          counterparty: [
+            '',
+            [
+              Validators.required,
+              Validators.minLength(1),
+              Validators.maxLength(50),
+              Validators.pattern(this.namePattern),
+            ],
+          ],
+          debtDate: [new Date(), [this.pastOrTodayDateValidator()]],
         }
       : {};
 
@@ -139,6 +156,26 @@ export class DebtForm implements OnInit, OnChanges {
   }
 
   /** Validators */
+  private numericAmountValidator() {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value && control.value !== 0) return null;
+      const parsed = parseFloat(control.value);
+      if (isNaN(parsed)) return { invalidAmount: true };
+      if (parsed < 0.01) return { min: true };
+      if (parsed > 10_000_000) return { max: true };
+      return null;
+    };
+  }
+
+  private pastOrTodayDateValidator() {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
+      return control.value <= today ? null : { futureDate: true };
+    };
+  }
+
   private dueDateValidator(referenceDate: Date) {
     return (control: AbstractControl): ValidationErrors | null => {
       if (!control.value) return null;
@@ -192,6 +229,7 @@ export class DebtForm implements OnInit, OnChanges {
     }
 
     const { counterparty, description, amount, debtDate, dueDate } = this.form.value;
+    const parsedAmount = parseFloat(amount);
 
     if (this.mode === 'create') {
       const payload: IDebtCreate =
@@ -200,7 +238,7 @@ export class DebtForm implements OnInit, OnChanges {
               debtor: counterparty,
               creditor: currentUserId,
               description,
-              amount,
+              amount: parsedAmount,
               debtDate: this.formatDateToYYYYMMDD(debtDate),
               dueDate: dueDate ? this.formatDateToYYYYMMDD(dueDate) : undefined,
             }
@@ -208,7 +246,7 @@ export class DebtForm implements OnInit, OnChanges {
               debtor: currentUserId,
               creditor: counterparty,
               description,
-              amount,
+              amount: parsedAmount,
               debtDate: this.formatDateToYYYYMMDD(debtDate),
               dueDate: dueDate ? this.formatDateToYYYYMMDD(dueDate) : undefined,
             };
@@ -220,8 +258,8 @@ export class DebtForm implements OnInit, OnChanges {
       if (description !== this.initialFormValues.description) {
         payload.description = description;
       }
-      if (amount !== this.initialFormValues.amount) {
-        payload.amount = amount;
+      if (parsedAmount !== this.initialFormValues.amount) {
+        payload.amount = parsedAmount;
       }
       if (dueDate?.getTime() !== this.initialFormValues.dueDate?.getTime()) {
         payload.dueDate = this.formatDateToYYYYMMDD(dueDate);
@@ -231,7 +269,7 @@ export class DebtForm implements OnInit, OnChanges {
     }
   }
 
-  /** Format date to string */
+  /** Formats */
   private formatDateToYYYYMMDD(date: Date | null): string | undefined {
     if (!date) return undefined;
 
@@ -240,6 +278,21 @@ export class DebtForm implements OnInit, OnChanges {
     const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+  }
+
+  onAmountInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = input.value;
+
+    value = value.replace(/[^0-9.]/g, '');
+
+    const parts = value.split('.');
+    if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+
+    value = value.replace(/^0+(\d)/, '0');
+
+    input.value = value;
+    this.form.get('amount')?.setValue(value === '' ? null : value, { emitEvent: true });
   }
 
   onCancel(): void {
@@ -259,5 +312,10 @@ export class DebtForm implements OnInit, OnChanges {
 
   get hasNoChanges(): boolean {
     return this.mode === 'update' && this.form.hasError('noChanges');
+  }
+
+  onDebtModeChange(mode: 'creditor' | 'debtor'): void {
+    this.debtMode.set(mode);
+    this.debtModeService.setMode(mode);
   }
 }

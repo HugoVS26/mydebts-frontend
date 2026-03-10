@@ -8,6 +8,7 @@ import type { IDebt, IDebtCreate, IDebtUpdate } from 'src/app/features/debts/typ
 import { DebtForm } from 'src/app/features/debts/components/debt-form/debt-form';
 import { DebtsService } from 'src/app/features/debts/services/debts';
 import { SnackbarService } from 'src/app/core/services/snackbar';
+import { DebtModeService } from 'src/app/features/debts/services/debt-mode';
 
 @Component({
   selector: 'app-debt-form-page',
@@ -21,6 +22,7 @@ export class DebtFormPage implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private snackbar = inject(SnackbarService);
+  private debtModeService = inject(DebtModeService);
   private debtId: string | null = null;
 
   mode = signal<'create' | 'update'>('create');
@@ -31,6 +33,9 @@ export class DebtFormPage implements OnInit {
 
   ngOnInit(): void {
     this.debtId = this.route.snapshot.paramMap.get('debtId');
+
+    const queryMode = this.route.snapshot.queryParamMap.get('mode') as 'creditor' | 'debtor' | null;
+    if (queryMode) this.debtModeService.setMode(queryMode);
 
     if (this.debtId) {
       this.mode.set('update');
