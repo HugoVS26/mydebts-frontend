@@ -63,7 +63,7 @@
       <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
       } @empty {
       <li class="debt-list__card-item debt-list__empty">
-        <button class="debt-list__empty-button" routerLink="/debts/new">
+        <button class="debt-list__empty-button" routerLink="/debts/new" [queryParams]="{ mode: mode }">
           <mat-icon fontSet="material-symbols-outlined" class="debt-list__empty-icon">add</mat-icon>
         </button>
       </li>

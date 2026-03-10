@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 import type { IDebt } from '../../types/debt';
 import { DebtCard } from '../debt-card/debt-card';
@@ -16,6 +17,7 @@ import { AuthService } from '../../../auth/services/auth';
 import { ConfirmDialog } from 'src/app/shared/components/confirm-dialog/confirm-dialog/confirm-dialog';
 import { SnackbarService } from 'src/app/core/services/snackbar';
 import { RouterLink } from '@angular/router';
+import { DebtModeService } from '../../services/debt-mode';
 export interface DebtColumns {
   unpaid: IDebt[];
   paid: IDebt[];
@@ -60,6 +62,7 @@ export class DebtCardList {
   private breakpointObserver = inject(BreakpointObserver);
   private dialog = inject(MatDialog);
   private snackbar = inject(SnackbarService);
+  private debtModeService = inject(DebtModeService);
   private currentUserId = computed(() => this.authService.currentUser()?._id ?? null);
 
   isDesktop$: Observable<boolean> = this.breakpointObserver
@@ -70,14 +73,14 @@ export class DebtCardList {
     );
 
   /** Toggle mode for creditor or debtor */
-  private mode$ = new BehaviorSubject<'creditor' | 'debtor'>('creditor');
+  private mode$ = toObservable(this.debtModeService.mode);
 
   get mode(): 'creditor' | 'debtor' {
-    return this.mode$.value;
+    return this.debtModeService.mode();
   }
 
   toggleMode(mode: 'creditor' | 'debtor'): void {
-    this.mode$.next(mode);
+    this.debtModeService.setMode(mode);
   }
 
   /**  Sorting */

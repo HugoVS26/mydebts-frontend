@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { AuthService } from 'src/app/features/auth/services/auth';
 import { ThemeModeService } from 'src/app/core/services/theme-mode';
+import { DebtModeService } from 'src/app/features/debts/services/debt-mode';
 
 @Component({
   selector: 'app-navbar',
@@ -20,13 +21,14 @@ export class Navbar {
   private router = inject(Router);
   private authService = inject(AuthService);
   private themeService = inject(ThemeModeService);
+  readonly debtModeService = inject(DebtModeService);
   readonly isLightMode = this.themeService.isLightMode;
 
   isMenuOpen = signal(false);
 
   readonly navLinks = [
     { path: '/debts', label: 'Debts' },
-    { path: '/debts/new', label: 'New Debt' },
+    { path: '/debts/new', label: 'New Debt', queryPams: { mode: this.debtModeService.mode() } },
   ];
 
   isActive(path: string): boolean {
