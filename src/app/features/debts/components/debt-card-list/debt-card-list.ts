@@ -114,8 +114,14 @@ export class DebtCardList {
         case 'debtDateDesc':
           return +new Date(b.debtDate) - +new Date(a.debtDate);
         case 'dueDateAsc':
+          if (!a.dueDate && !b.dueDate) return 0;
+          if (!a.dueDate) return 1;
+          if (!b.dueDate) return -1;
           return +new Date(a.dueDate) - +new Date(b.dueDate);
         case 'dueDateDesc':
+          if (!a.dueDate && !b.dueDate) return 0;
+          if (!a.dueDate) return 1;
+          if (!b.dueDate) return -1;
           return +new Date(b.dueDate) - +new Date(a.dueDate);
         default:
           return 0;

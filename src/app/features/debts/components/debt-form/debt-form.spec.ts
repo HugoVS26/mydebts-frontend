@@ -179,7 +179,7 @@ describe('Given a DebtForm component', () => {
       expect(component.form.get('amount')?.value).toBe(debtMock.amount.toString());
 
       const formDueDate = component.form.get('dueDate')?.value as Date;
-      const expectedDueDate = new Date(debtMock.dueDate);
+      const expectedDueDate = new Date(debtMock.dueDate!);
 
       expect(formDueDate?.getTime()).toBe(expectedDueDate.getTime());
     });

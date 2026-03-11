@@ -1,14 +1,15 @@
 <mat-toolbar class="public-navbar">
   <div class="public-navbar__container">
     <github-corner href="https://github.com/HugoVS26" class="public-navbar__github" placement="top-left"
-      octocat-color="red" banner-color="yellow" size="46px">
+      octocat-color="red" banner-color="yellow" size="46px" aria-label="To github profile">
     </github-corner>
     <a class="public-navbar__link" routerLink="/" [class.navbar__link--active]="isActive('/')">
       MyDebts
     </a>
 
     <div class="public-navbar__actions">
-      <button class="public-navbar__button" matButton="outlined" [routerLink]="['/login']">Log In</button>
+      <button class="public-navbar__button" matButton="outlined" [routerLink]="['/login']" aria-label="To log in">Log
+        In</button>
     </div>
 
     <button class="public-navbar__theme-toggle public-navbar__theme-toggle--desktop theme-toggle" type="button"

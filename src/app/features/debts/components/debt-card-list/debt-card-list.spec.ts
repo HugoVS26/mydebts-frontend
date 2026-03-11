@@ -87,8 +87,8 @@ describe('Given a DebtList component', () => {
       const sortingValue = 'dueDateAsc';
 
       const sortedDebts = component['sortDebts'](debtsMock as IDebt[], sortingValue);
-      const firstDue = new Date(sortedDebts[0].dueDate).getTime();
-      const secondDue = new Date(sortedDebts[1].dueDate).getTime();
+      const firstDue = new Date(sortedDebts[0].dueDate!).getTime();
+      const secondDue = new Date(sortedDebts[1].dueDate!).getTime();
 
       expect(firstDue).toBeLessThanOrEqual(secondDue);
     });
