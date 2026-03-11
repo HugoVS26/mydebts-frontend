@@ -7,7 +7,7 @@ export interface IDebt {
   amount: number;
   description: string;
   debtDate: string;
-  dueDate: string;
+  dueDate?: string;
   status: 'paid' | 'unpaid' | 'overdue';
   createdAt: string;
   updatedAt: string;

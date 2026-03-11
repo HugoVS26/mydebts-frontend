@@ -7,7 +7,7 @@
     <mat-card-header class="debt-card__header">
       <mat-card-title class="debt-card__title">{{ debt.description | slice:0:30 }}{{debt.description.length > 30 ? '...'
         : '' }}</mat-card-title>
-      <button class="debt-card__header-button">
+      <button class="debt-card__header-button" aria-label="See debt details">
         <mat-icon class="debt-card__header-icon">chevron_right</mat-icon>
       </button>
     </mat-card-header>
