@@ -161,13 +161,13 @@ export class DebtCardList {
       for (const debt of debts) {
         const otherUser = mode === 'creditor' ? debt.debtor : debt.creditor;
 
-        if (otherUser === currentUserId || !otherUser) continue;
-
         const _id = typeof otherUser === 'string' ? otherUser : (otherUser._id ?? 'unknown');
         const name =
           typeof otherUser === 'string' ? otherUser : (otherUser.displayName ?? 'Unnamed');
 
-        if (!mapById.has(_id)) mapById.set(_id, { _id: _id, name });
+        if (!otherUser || _id === currentUserId) continue;
+
+        if (!mapById.has(_id)) mapById.set(_id, { _id, name });
       }
 
       return Array.from(mapById.values());
