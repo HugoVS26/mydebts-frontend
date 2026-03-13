@@ -1,14 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, ViewChild } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { BehaviorSubject, combineLatest, map, shareReplay, tap } from 'rxjs';
 import type { Observable } from 'rxjs';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 
 import type { IDebt } from '../../types/debt';
 import { DebtCard } from '../debt-card/debt-card';
@@ -18,6 +19,7 @@ import { ConfirmDialog } from 'src/app/shared/components/confirm-dialog/confirm-
 import { SnackbarService } from 'src/app/core/services/snackbar';
 import { RouterLink } from '@angular/router';
 import { DebtModeService } from '../../services/debt-mode';
+import { SwipeService } from 'src/app/core/services/swipe';
 export interface DebtColumns {
   unpaid: IDebt[];
   paid: IDebt[];
@@ -40,6 +42,7 @@ const SORT_OPTIONS = [
   { value: 'dueDateDesc', label: 'Due date: Latest' },
 ];
 
+const TOTAL_TABS = 3;
 @Component({
   selector: 'app-debt-card-list',
   standalone: true,
@@ -51,26 +54,29 @@ const SORT_OPTIONS = [
     MatDividerModule,
     MatSelectModule,
     RouterLink,
+    MatTabsModule,
+    MatTabGroup,
   ],
   templateUrl: './debt-card-list.html',
   styleUrls: ['./debt-card-list.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DebtCardList {
+  @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
+
   private debtsService = inject(DebtsService);
   private authService = inject(AuthService);
   private breakpointObserver = inject(BreakpointObserver);
   private dialog = inject(MatDialog);
   private snackbar = inject(SnackbarService);
   private debtModeService = inject(DebtModeService);
+  private readonly swipeService = inject(SwipeService);
   private currentUserId = computed(() => this.authService.currentUser()?._id ?? null);
 
-  isDesktop$: Observable<boolean> = this.breakpointObserver
-    .observe([Breakpoints.Medium, Breakpoints.Large, Breakpoints.XLarge])
-    .pipe(
-      map((result) => result.matches),
-      shareReplay({ refCount: true }),
-    );
+  isDesktop$: Observable<boolean> = this.breakpointObserver.observe(['(min-width: 1024px)']).pipe(
+    map((result) => result.matches),
+    shareReplay({ refCount: true }),
+  );
 
   /** Toggle mode for creditor or debtor */
   private mode$ = toObservable(this.debtModeService.mode);
@@ -252,6 +258,23 @@ export class DebtCardList {
         });
       }
     });
+  }
+
+  onTouchStart(e: TouchEvent): void {
+    this.swipeService.onTouchStart(e);
+  }
+
+  onTouchEnd(e: TouchEvent): void {
+    const direction = this.swipeService.getSwipeDirection(e);
+    if (!direction) return;
+
+    const current = this.tabGroup.selectedIndex ?? 0;
+
+    if (direction === 'left' && current < TOTAL_TABS - 1) {
+      this.tabGroup.selectedIndex = current + 1;
+    } else if (direction === 'right' && current > 0) {
+      this.tabGroup.selectedIndex = current - 1;
+    }
   }
 
   /** Helpers */

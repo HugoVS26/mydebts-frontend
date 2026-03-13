@@ -21,29 +21,28 @@
       <mat-select [(value)]="selectedDebtors" (selectionChange)="applyDebtorSelection($event.value)" multiple>
         <mat-select-trigger>
           {{ firstSelectedDebtorName }}
-          @if ((selectedDebtors.length) > 1) {
+          @if (selectedDebtors.length > 1) {
           <span class="additional-selection">
-            (+{{ selectedDebtors.length - 1 }}
-            {{ selectedDebtors.length === 2 ? 'other' : 'others' }})
+            (+{{ selectedDebtors.length - 1 }} {{ selectedDebtors.length === 2 ? 'other' : 'others' }})
           </span>
           }
         </mat-select-trigger>
-
         @for (debtor of (debtors$ | async); track debtor._id) {
-        <mat-option [value]="debtor._id">
-          {{ debtor.name }}
-        </mat-option>
+        <mat-option [value]="debtor._id">{{ debtor.name }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
   </div>
 </div>
 
+@if (isDesktop$ | async) {
 <div class="debt-list">
-
   <div class="debt-list__column debt-list__column--overdue"
     [class.debt-list__column--empty]="!(filteredDebts$ | async)?.['overdue']?.length">
-    <h3 class="debt-list__column-title">Overdue</h3>
+    <h3 class="debt-list__column-title">Overdue @if ((filteredDebts$ | async)?.['overdue']?.length) {
+      <span class="debt-list__column-badge">{{ (filteredDebts$ | async)?.['overdue']?.length }}</span>
+      }
+    </h3>
     <ol class="debt-list__cards">
       @for (debt of (filteredDebts$ | async)?.['overdue']; track trackByDebtId($index, debt)) {
       <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
@@ -55,9 +54,11 @@
     </ol>
   </div>
 
-
   <div class="debt-list__column debt-list__column--unpaid">
-    <h3 class="debt-list__column-title">Unpaid</h3>
+    <h3 class="debt-list__column-title">Unpaid @if ((filteredDebts$ | async)?.['unpaid']?.length) {
+      <span class="debt-list__column-badge">{{ (filteredDebts$ | async)?.['unpaid']?.length }}</span>
+      }
+    </h3>
     <ol class="debt-list__cards">
       @for (debt of (filteredDebts$ | async)?.['unpaid']; track trackByDebtId($index, debt)) {
       <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
@@ -71,13 +72,15 @@
     </ol>
   </div>
 
-
   <div class="debt-list__column debt-list__column--paid"
     [class.debt-list__column--empty]="!(filteredDebts$ | async)?.['paid']?.length">
     <div class="debt-list__column-header">
-      <h3 class="debt-list__column-title">Paid</h3>
+      <h3 class="debt-list__column-title">Paid @if ((filteredDebts$ | async)?.['paid']?.length) {
+        <span class="debt-list__column-badge">{{ (filteredDebts$ | async)?.['paid']?.length }}</span>
+        }
+      </h3>
       @if ((filteredDebts$ | async)?.['paid']?.length) {
-      <button mat-icon-button (click)="onDeleteAllPaid()" title="Delete all paid debts"
+      <button mat-icon-button class="debt-list__unpaid-button" (click)="onDeleteAllPaid()" title="Delete all paid debts"
         aria-label="Delete all paid debts">
         <mat-icon>delete_sweep</mat-icon>
       </button>
@@ -88,9 +91,77 @@
       <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
       } @empty {
       <li class="debt-list__card-item debt-list__empty">
-        No paid debts found. <br> Looks like you’re all caught up! ✅
+        No paid debts found. <br> Looks like you're all caught up! ✅
       </li>
       }
     </ol>
   </div>
 </div>
+} @else {
+<mat-tab-group animationDuration="200ms" class="debt-list__tabs" (touchstart)="onTouchStart($event)"
+  (touchend)="onTouchEnd($event)">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      Unpaid
+      @if ((filteredDebts$ | async)?.['unpaid']?.length) {
+      <span class="debt-list__tab-badge">{{ (filteredDebts$ | async)?.['unpaid']?.length }}</span>
+      }
+    </ng-template>
+    <ol class="debt-list__cards">
+      @for (debt of (filteredDebts$ | async)?.['unpaid']; track trackByDebtId($index, debt)) {
+      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
+      } @empty {
+      <li class="debt-list__card-item debt-list__empty">
+        <button class="debt-list__empty-button" routerLink="/debts/new" [queryParams]="{ mode: mode }">
+          <mat-icon fontSet="material-symbols-outlined" class="debt-list__empty-icon">add</mat-icon>
+        </button>
+      </li>
+      }
+    </ol>
+  </mat-tab>
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      Overdue
+      @if ((filteredDebts$ | async)?.['overdue']?.length) {
+      <span class="debt-list__tab-badge">{{ (filteredDebts$ | async)?.['overdue']?.length }}</span>
+      }
+    </ng-template>
+    <ol class="debt-list__cards">
+      @for (debt of (filteredDebts$ | async)?.['overdue']; track trackByDebtId($index, debt)) {
+      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
+      } @empty {
+      <li class="debt-list__card-item debt-list__empty">
+        No overdue debts. <br> Good job staying on top of things! 💪
+      </li>
+      }
+    </ol>
+  </mat-tab>
+
+  <mat-tab>
+    <ng-template mat-tab-label>
+      Paid
+      @if ((filteredDebts$ | async)?.['paid']?.length) {
+      <span class="debt-list__tab-badge">{{ (filteredDebts$ | async)?.['paid']?.length }}</span>
+      }
+    </ng-template>
+    <div class="debt-list__tab-actions">
+      @if ((filteredDebts$ | async)?.['paid']?.length) {
+      <button mat-icon-button class="debt-list__unpaid-button" (click)="onDeleteAllPaid()" title="Delete all paid debts"
+        aria-label="Delete all paid debts">
+        <mat-icon class="dent-list__unpaid-icon">delete_sweep</mat-icon>
+      </button>
+      }
+    </div>
+    <ol class="debt-list__cards">
+      @for (debt of (filteredDebts$ | async)?.['paid']; track trackByDebtId($index, debt)) {
+      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
+      } @empty {
+      <li class="debt-list__card-item debt-list__empty">
+        No paid debts found. <br> Looks like you're all caught up! ✅
+      </li>
+      }
+    </ol>
+  </mat-tab>
+</mat-tab-group>
+}

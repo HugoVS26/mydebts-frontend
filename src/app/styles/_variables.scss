@@ -1,7 +1,13 @@
+@use 'sass:color';
+
 // Debts colors
 $unpaid: #ffdf91;
 $overdue: #ff897d;
 $paid: #cfef70;
+
+$unpaid-dark: color.adjust($unpaid, $lightness: -10%);
+$overdue-dark: color.adjust($overdue, $lightness: -10%);
+$paid-dark: color.adjust($paid, $lightness: -10%);
 
 // Toolbar height
 $toolbar-standard-height: 64px;

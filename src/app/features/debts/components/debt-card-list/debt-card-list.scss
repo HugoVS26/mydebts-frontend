@@ -1,11 +1,16 @@
+@use '../../../../styles/variables' as vars;
+@use '../../../../styles/mixins' as mix;
+
 :host {
   display: flex;
   flex-direction: column;
+  height: calc(100dvh - #{vars.$toolbar-mobile-height});
   padding: 0 16px;
-  padding-bottom: 3rem;
+  overflow: hidden;
 
   @media (min-width: 1024px) {
-    align-items: stretch;
+    height: calc(100dvh - #{vars.$toolbar-standard-height});
+    overflow: hidden;
     padding: 0 2rem;
   }
 }
@@ -20,14 +25,19 @@
   gap: 3rem;
   align-items: center;
   width: 100%;
+  padding-bottom: 3rem;
 
   @media (min-width: 1024px) {
     flex-direction: row;
     justify-content: center;
-    gap: 3rem;
     align-items: start;
+    gap: 3rem;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
+  // Header
   &__header {
     padding-top: 1rem;
     display: flex;
@@ -37,14 +47,16 @@
     gap: 1.5rem;
     width: 100%;
     box-sizing: border-box;
+    background-color: var(--mat-sys-surface);
+    flex-shrink: 0;
 
     @media (min-width: 1024px) {
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      align-content: flex-start;
       padding-top: 1.5rem;
       padding-bottom: 2rem;
+      position: sticky;
 
       .debt-list__filters {
         order: 1;
@@ -75,14 +87,15 @@
     width: 100%;
 
     @media (min-width: 1024px) {
-      align-items: center;
       justify-content: flex-start;
     }
   }
 
+  // Desktop Columns
   &__column {
     display: flex;
     flex-direction: column;
+    align-items: center;
     flex: 1;
     gap: 1rem;
     width: 100%;
@@ -92,73 +105,32 @@
     @media (max-width: 1024px) {
       gap: 0;
       min-height: 100px;
-    }
-
-    &:not(:last-child) {
-      padding-bottom: 3rem;
-      border-bottom: 1px solid var(--mat-sys-outline, rgba(0, 0, 0, 0.12));
+      border-bottom: none;
     }
 
     @media (min-width: 1024px) {
-      &:not(:last-child) {
-        border-bottom: none;
+      overflow-y: auto;
+      height: 100%;
+      padding-bottom: 2rem;
+      @include mix.subtle-scrollbar;
+    }
+
+    &:not(:last-child) {
+      @media (min-width: 1024px) {
         border-right: 1px solid var(--mat-sys-outline, rgba(0, 0, 0, 0.12));
-        padding-bottom: 0;
         padding-right: 3rem;
       }
     }
   }
 
-  &__column-header {
-    margin: 0;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.5rem;
-
-    h3 {
-      margin-block-start: 0;
-      margin-block-end: 0;
-    }
-
-    button {
-      position: absolute;
-      right: 0;
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      color: var(--mat-sys-inverse-surface);
-    }
-  }
-
-  &__column-title {
-    margin: 0;
-    margin-block-start: 0;
-    margin-block-end: 0;
-    margin-bottom: 0.5rem;
-    font-size: 1.25rem;
-    text-align: center;
-    text-transform: uppercase;
-  }
-
   &__column--overdue {
     order: 2;
-    @media (min-width: 1024px) {
-      order: 2;
-    }
   }
   &__column--unpaid {
     order: 1;
-    @media (min-width: 1024px) {
-      order: 1;
-    }
   }
   &__column--paid {
     order: 3;
-    @media (min-width: 1024px) {
-      order: 3;
-    }
   }
 
   @media (max-width: 1024px) {
@@ -167,6 +139,29 @@
     }
   }
 
+  &__column-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 0.5rem;
+
+    h3 {
+      margin-block-start: 0;
+      margin-block-end: 0;
+    }
+  }
+
+  &__column-title {
+    margin: 0;
+    font-size: 1.25rem;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  // Cards
   &__cards {
     display: flex;
     flex-direction: column;
@@ -174,6 +169,11 @@
     width: 100%;
     max-width: 300px;
     flex: 1;
+
+    .debt-list__card-item {
+      display: block;
+      width: 100%;
+    }
 
     @media (max-width: 1024px) {
       &:has(.debt-list__empty) {
@@ -183,11 +183,6 @@
       }
     }
 
-    .debt-list__card-item {
-      display: block;
-      width: 100%;
-    }
-
     @media (min-width: 1024px) {
       display: grid;
       grid-template-columns: 1fr;
@@ -195,6 +190,7 @@
     }
   }
 
+  // Empty State
   &__empty {
     text-align: center;
     flex: 1;
@@ -203,12 +199,6 @@
     align-items: center;
     justify-content: center;
     margin-top: 4rem;
-
-    @media (max-width: 1024px) {
-      &__column--empty {
-        display: none;
-      }
-    }
 
     &-button {
       background: none;
@@ -235,6 +225,129 @@
         height: 48px;
         width: 48px;
       }
+    }
+  }
+
+  // Delete Button (desktop)
+  &__unpaid-button {
+    position: absolute;
+    right: 0;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--mat-sys-inverse-surface);
+  }
+
+  // Mobile Tabs
+  &__tabs {
+    width: 100%;
+    flex: 1;
+    align-items: center;
+    min-height: 0;
+    padding-bottom: 1rem;
+    justify-content: center;
+
+    ::ng-deep {
+      .mat-mdc-tab-group,
+      &.mat-mdc-tab-group {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .mat-mdc-tab:nth-child(1) .debt-list__tab-badge {
+        background-color: vars.$unpaid-dark;
+        color: #000;
+      }
+      .mat-mdc-tab:nth-child(2) .debt-list__tab-badge {
+        background-color: vars.$overdue-dark;
+        color: #000;
+      }
+      .mat-mdc-tab:nth-child(3) .debt-list__tab-badge {
+        background-color: vars.$paid-dark;
+        color: #000;
+      }
+
+      .mat-mdc-tab-header {
+        flex-shrink: 0;
+        min-width: 350px;
+        background-color: var(--mat-sys-surface);
+
+        .mat-mdc-tab {
+          flex: 1;
+          min-width: 0;
+        }
+      }
+
+      .mat-mdc-tab-body-wrapper {
+        flex: 1;
+        min-height: 0;
+        min-width: 300px;
+        overflow: hidden;
+      }
+
+      .mat-mdc-tab-body {
+        overflow: hidden;
+      }
+
+      .mat-mdc-tab-body-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-y: auto;
+        padding-right: 10px;
+        scrollbar-gutter: stable;
+        @include mix.subtle-scrollbar;
+      }
+    }
+
+    .debt-list__cards {
+      padding-top: 1rem;
+      flex: 1;
+      align-items: center;
+    }
+  }
+
+  &__column-badge,
+  &__tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    font-size: 12px;
+    line-height: 1;
+    margin-left: 6px;
+    vertical-align: top;
+    font-weight: 600;
+  }
+
+  &__column--unpaid &__column-badge {
+    background-color: vars.$unpaid-dark;
+    color: #000;
+  }
+  &__column--overdue &__column-badge {
+    background-color: vars.$overdue-dark;
+    color: #000;
+  }
+  &__column--paid &__column-badge {
+    background-color: vars.$paid-dark;
+    color: #000;
+  }
+
+  &__tab-actions {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    max-width: 300px;
+    padding-top: 0.5rem;
+
+    .debt-list__unpaid-button {
+      position: static;
+      color: var(--mat-sys-inverse-surface);
     }
   }
 }

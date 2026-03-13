@@ -12,3 +12,18 @@
   max-width: 1440px;
   margin: 0 auto;
 }
+
+@mixin subtle-scrollbar {
+  &::-webkit-scrollbar {
+    width: 2px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--mat-sys-outline);
+    border-radius: 4px;
+  }
+}
