@@ -85,6 +85,7 @@ $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
   &__title {
     font-size: 14px;
     font-weight: bold;
+    text-transform: capitalize;
   }
 
   &__content {
