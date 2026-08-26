@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npx tsc -p tsconfig.app.json --noEmit)",
+      "PowerShell(npx tsc -p tsconfig.spec.json --noEmit)",
+      "PowerShell(npx ng build 2>&1)"
+    ]
+  }
+}
