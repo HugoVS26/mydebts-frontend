@@ -41,6 +41,8 @@ html {
 
 html.light-theme {
   color-scheme: light;
+  --app-primary-text: #{map.get(bp.$primary-palette, 40)};
+  --app-on-primary: #{map.get(bp.$neutral-palette, 10)};
 
   @include mat.theme(
     light-theme.$light-theme,
@@ -55,6 +57,9 @@ html.light-theme {
 }
 
 html.dark-theme {
+  --app-primary-text: #{map.get(bp.$primary-palette, 80)};
+  --app-on-primary: #{map.get(bp.$neutral-palette, 10)};
+
   @include mat.theme(
     dark-theme.$dark-theme,
     $overrides: (
@@ -97,6 +102,12 @@ body {
   body {
     padding-top: var(--mat-toolbar-mobile-height);
   }
+}
+
+// Home page uses the "background" tone as its page canvas so surface-toned
+// blocks (toolbar, board, CTA band) stand out. Toggled by HomePage.
+body.home-page {
+  background-color: var(--mat-sys-background);
 }
 
 .snackbar--error {

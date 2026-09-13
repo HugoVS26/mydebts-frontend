@@ -32,13 +32,15 @@ $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
     outline-offset: 4px;
   }
 
+  // Fold strip / corner. Both overlap the card body by a hair so no
+  // anti-aliasing seam shows at the joint when the note is rotated.
   &::after {
     content: '';
     position: absolute;
     bottom: -2em;
     left: 0;
     right: 2em;
-    border-width: 1em;
+    border-width: calc(1em + 1px);
     border-style: solid;
     border-color: $note-color;
   }
@@ -48,7 +50,7 @@ $note-fold: color.adjust($note-color, $lightness: -10%) transparent;
     position: absolute;
     bottom: -2em;
     right: 0;
-    border-width: 2em 2em 0 0;
+    border-width: calc(2em + 2px) 2em 0 0;
     border-style: solid;
     border-color: $note-fold;
   }
