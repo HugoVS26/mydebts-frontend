@@ -1,66 +1,97 @@
 <app-public-navbar></app-public-navbar>
 <div class="home">
-  <section class="home__main">
-    <div>
-      <h1 class="home__title">
-        Track Your Debts,<br>
-        <div class="split-text__container">
-          <span class="text-part text-part--left">Effort</span>
-          <span class="text-part text-part--right">lessly</span>
-        </div>
-      </h1>
+  <section class="home__hero">
+    <div class="home__copy">
+      <h1 class="home__title">Track your debts<br />Keep your friends</h1>
       <p class="home__subtitle">
-        Track debts with your friends before<br> the friendship gets complicated 💸
+        Write down who owes what, share it, and mark it paid before the friendship gets complicated
       </p>
       <div class="home__cta">
-        <button matButton="filled" color="primary" [routerLink]="['/register']" aria-label="To register">
+        <button matButton="filled" class="home__button" [routerLink]="['/register']" aria-label="To register">
           Get Started
         </button>
+        <button matButton="outlined" class="home__button" [routerLink]="['/login']" aria-label="To log in">
+          Log In
+        </button>
+      </div>
+      <ul class="home__trust">
+        @for (item of trustItems; track item.label) {
+        <li class="home__trust-item">
+          <mat-icon class="home__trust-icon" fontSet="material-symbols-outlined">{{
+            item.icon
+            }}</mat-icon>
+          <span>{{ item.label }}</span>
+        </li>
+        }
+      </ul>
+    </div>
+
+    <div class="home__board" aria-hidden="true">
+      <div class="home__board-canvas">
+        <div class="home__note home__note--unpaid">
+          <span class="home__pin"></span>
+          <app-debt-card class="debt-card debt-card__status--unpaid" [debt]="exampleDebts.unpaid" [mode]="'debtor'" />
+        </div>
+        <div class="home__note home__note--overdue">
+          <span class="home__pin"></span>
+          <app-debt-card class="debt-card debt-card__status--overdue" [debt]="exampleDebts.overdue" [mode]="'debtor'" />
+        </div>
+        <div class="home__note home__note--paid">
+          <span class="home__pin"></span>
+          <app-debt-card class="debt-card debt-card__status--paid" [debt]="exampleDebts.paid" [mode]="'creditor'" />
+        </div>
       </div>
     </div>
-    <div class="home__debts-grid">
+  </section>
 
-      <app-debt-card class="debt-card debt-card__status--unpaid" [debt]="exampleDebts.unpaid" [mode]="'debtor'" />
+  <section class="home__steps">
+    <header class="home__steps-head">
+      <h2 class="home__steps-title">Just three simple steps</h2>
+      <p class="home__steps-sub">
+        No chaotic notes, no bank logins, no passive-aggressive group messages.
+      </p>
+    </header>
+    <ol class="home__steps-grid">
+      @for (step of steps; track step.num) {
+      <li class="home__step">
+        <div class="home__step-top">
+          <span class="home__step-badge">
+            <mat-icon class="home__step-icon" fontSet="material-symbols-outlined">{{
+              step.icon
+              }}</mat-icon>
+          </span>
+        </div>
+        <h3 class="home__step-title">{{ step.title }}</h3>
+        <p class="home__step-desc">{{ step.description }}</p>
+      </li>
+      }
+    </ol>
+  </section>
 
-      <app-debt-card class="debt-card debt-card__status--paid" [debt]="exampleDebts.overdue" [mode]="'debtor'" />
-
-      <app-debt-card class="debt-card debt-card__status--overdue" [debt]="exampleDebts.paid" [mode]="'creditor'" />
-
+  <section class="home__cta-section">
+    <div class="home__cta-band">
+      <h2 class="home__cta-title">Settle up before it gets weird</h2>
+      <p class="home__cta-sub">
+        Create your first note in under a minute.<br />
+        Your friends will thank you eventually.
+      </p>
+      <button matButton="filled" class="home__button" [routerLink]="['/register']" aria-label="To register">
+        Get Started
+      </button>
     </div>
   </section>
 
-  <section class="home__features">
-    <h2>Why MyDebts?</h2>
-    <div class="home__features-grid">
-      <mat-card class="home__features-grid__item">
-        <mat-card-header class="home__features-grid__header">
-          <mat-icon class="home__features-grid__icon" color="primary">people</mat-icon>
-          <mat-card-title>Track Everyone</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          Because 'I think he owes me something' is not a <br>financial plan.
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="home__features-grid__item">
-        <mat-card-header class="home__features-grid__header">
-          <mat-icon class="home__features-grid__icon" color="primary">notifications</mat-icon>
-          <mat-card-title>Never Forget</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          Your friends forget. The app doesn't.
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="home__features-grid__item">
-        <mat-card-header class="home__features-grid__header">
-          <mat-icon class="home__features-grid__icon" color="primary">check</mat-icon>
-          <mat-card-title>Mark as Paid</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          The most satisfying button you'll ever click.
-        </mat-card-content>
-      </mat-card>
+  <footer class="home__footer">
+    <div class="home__footer-left">
+      <span class="home__wordmark">MyDebts</span>
+      <span class="home__tagline">Made for friends who split the bill.</span>
     </div>
-  </section>
+    <div class="home__footer-right">
+      <a class="home__github" href="https://github.com/HugoVS26/mydebts-frontend" target="_blank" rel="noopener">
+        <mat-icon class="home__github-icon" fontSet="material-symbols-outlined">code</mat-icon>
+        <span>GitHub</span>
+      </a>
+      <span class="home__copyright">© {{ currentYear }} MyDebts</span>
+    </div>
+  </footer>
 </div>

@@ -9,6 +9,9 @@
   right: 0;
   z-index: 99;
   width: 100%;
+  background-color: var(--mat-sys-surface);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  box-sizing: border-box;
 
   &__github {
     position: fixed;
@@ -17,7 +20,7 @@
     z-index: 100;
 
     &::part(banner) {
-      fill: var(--mat-sys-on-surface);
+      fill: var(--mat-sys-inverse-surface);
       transition: fill 0.2s;
     }
 
@@ -25,10 +28,12 @@
       fill: var(--mat-sys-inverse-on-surface);
     }
 
-    &:hover::part(octocat-arm) {
-      animation-name: wave-hand;
-      animation-duration: 0.3s;
-      animation-iteration-count: infinite;
+    // The element ships its own wave-hand keyframes inside its shadow DOM, but
+    // keyframe names are tree-scoped, so a ::part() rule can't reference them.
+    // Redeclare them here so the hover animation actually runs.
+    &:hover::part(octocat-arm),
+    &:active::part(octocat-arm) {
+      animation: wave-hand 0.56s ease-in-out infinite;
     }
 
     @media (max-width: 1024px) {
@@ -55,6 +60,7 @@
     font-size: 22px;
     font-weight: 600;
     text-decoration: none;
+    color: var(--mat-sys-on-surface);
 
     @media (max-width: 1024px) {
       position: absolute;
@@ -75,6 +81,12 @@
 
   &__button {
     font-size: 14px;
+    @include mat.button-overrides(
+      (
+        outlined-label-text-color: var(--app-primary-text),
+        outlined-outline-color: var(--mat-sys-outline),
+      )
+    );
 
     @media (max-width: 768px) {
       height: 32px;
@@ -119,12 +131,8 @@
     }
   }
 
-  :host-context(.light-theme) &__theme-toggle svg {
-    fill: #353025;
-  }
-
-  :host-context(.dark-theme) &__theme-toggle svg {
-    fill: #f1c02b;
+  &__theme-toggle svg {
+    fill: var(--mat-sys-on-surface);
   }
 
   .hamburger-inner,
@@ -144,4 +152,19 @@
 
 .hamburger-box span {
   transform: scale(0.8);
+}
+
+@keyframes wave-hand {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20%,
+  60% {
+    transform: rotate(-25deg);
+  }
+  40%,
+  80% {
+    transform: rotate(10deg);
+  }
 }
