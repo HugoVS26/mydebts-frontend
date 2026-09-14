@@ -8,6 +8,7 @@ import { firstValueFrom, of, take } from 'rxjs';
 import type { MatDialog } from '@angular/material/dialog';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
+import { provideRouter } from '@angular/router';
 
 import type { DebtColumns } from './debt-card-list';
 import { DebtCardList } from './debt-card-list';
@@ -48,6 +49,7 @@ describe('Given a DebtList component', () => {
         provideZonelessChangeDetection(),
         provideHttpClient(),
         provideHttpClientTesting(),
+        provideRouter([]),
       ],
     }).compileComponents();
 

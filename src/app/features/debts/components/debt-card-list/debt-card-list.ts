@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, computed, ViewChild } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { BehaviorSubject, combineLatest, map, shareReplay, tap } from 'rxjs';
 import type { Observable } from 'rxjs';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatDividerModule } from '@angular/material/divider';
+import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
@@ -26,32 +25,83 @@ export interface DebtColumns {
   overdue: IDebt[];
 }
 
+export type DebtStatus = keyof DebtColumns;
+
+interface StatusSummary {
+  count: number;
+  amount: number;
+}
+
+export interface DebtSummary {
+  /** Outstanding amount: unpaid + overdue */
+  total: number;
+  unpaid: StatusSummary;
+  overdue: StatusSummary;
+  paid: StatusSummary;
+}
+
+interface ColumnMeta {
+  status: DebtStatus;
+  title: string;
+  icon: string;
+  emptyIcon: string;
+  /** One entry per line in the empty state */
+  emptyMessage: string[];
+}
+
 interface DebtorOption {
   _id?: string;
   name: string;
 }
 
+/** `shortLabel` is what the compact mobile sort chip shows. */
 const SORT_OPTIONS = [
-  { value: 'creationDateDesc', label: 'Creation date: Newest' },
-  { value: 'creationDateAsc', label: 'Creation date: Oldest' },
-  { value: 'amountAsc', label: 'Amount: Lowest' },
-  { value: 'amountDesc', label: 'Amount: Highest' },
-  { value: 'debtDateAsc', label: 'Debt date: Earliest' },
-  { value: 'debtDateDesc', label: 'Debt date: Latest' },
-  { value: 'dueDateAsc', label: 'Due date: Earliest' },
-  { value: 'dueDateDesc', label: 'Due date: Latest' },
+  { value: 'creationDateDesc', label: 'Creation date · Newest', shortLabel: 'Newest first' },
+  { value: 'creationDateAsc', label: 'Creation date · Oldest', shortLabel: 'Oldest first' },
+  { value: 'amountAsc', label: 'Amount · Lowest', shortLabel: 'Lowest amount' },
+  { value: 'amountDesc', label: 'Amount · Highest', shortLabel: 'Highest amount' },
+  { value: 'debtDateAsc', label: 'Debt date · Earliest', shortLabel: 'Earliest debt date' },
+  { value: 'debtDateDesc', label: 'Debt date · Latest', shortLabel: 'Latest debt date' },
+  { value: 'dueDateAsc', label: 'Due date · Earliest', shortLabel: 'Earliest due date' },
+  { value: 'dueDateDesc', label: 'Due date · Latest', shortLabel: 'Latest due date' },
 ];
 
-const TOTAL_TABS = 3;
+/** Board columns, in display order (desktop columns and mobile tabs). */
+const COLUMNS: ColumnMeta[] = [
+  {
+    status: 'unpaid',
+    title: 'Unpaid',
+    icon: 'hourglass_top',
+    emptyIcon: 'sticky_note_2',
+    emptyMessage: ['No unpaid debts.', 'Enjoy the peace while it lasts'],
+  },
+  {
+    status: 'overdue',
+    title: 'Overdue',
+    icon: 'skull',
+    emptyIcon: 'thumb_up',
+    emptyMessage: ['No overdue debts.', 'Good job staying on top of things!'],
+  },
+  {
+    status: 'paid',
+    title: 'Paid',
+    icon: 'check',
+    emptyIcon: 'task_alt',
+    emptyMessage: ['No paid debts found.', "Looks like you're all caught up!"],
+  },
+];
+
+const TOTAL_TABS = COLUMNS.length;
 @Component({
   selector: 'app-debt-card-list',
   standalone: true,
   imports: [
     DebtCard,
     AsyncPipe,
-    MatButtonToggleModule,
+    DecimalPipe,
+    NgTemplateOutlet,
+    MatButtonModule,
     MatIcon,
-    MatDividerModule,
     MatSelectModule,
     RouterLink,
     MatTabsModule,
@@ -78,6 +128,8 @@ export class DebtCardList {
     shareReplay({ refCount: true }),
   );
 
+  columns = COLUMNS;
+
   /** Toggle mode for creditor or debtor */
   private mode$ = toObservable(this.debtModeService.mode);
 
@@ -101,6 +153,10 @@ export class DebtCardList {
   }
   applySortSelection(sort: string): void {
     this.sortSelection$.next(sort);
+  }
+
+  get selectedSortShortLabel(): string {
+    return SORT_OPTIONS.find((option) => option.value === this.selectedSort)?.shortLabel ?? '';
   }
 
   private sortDebts(debts: IDebt[], sort: string): IDebt[] {
@@ -237,6 +293,22 @@ export class DebtCardList {
     }),
   );
 
+  /** Totals per status for the summary strip (follows the active filters) */
+  summary$: Observable<DebtSummary> = this.filteredDebts$.pipe(
+    map((columns) => {
+      const summarize = (debts: IDebt[]): StatusSummary => ({
+        count: debts.length,
+        amount: debts.reduce((sum, debt) => sum + debt.amount, 0),
+      });
+      const unpaid = summarize(columns.unpaid);
+      const overdue = summarize(columns.overdue);
+      const paid = summarize(columns.paid);
+
+      return { total: unpaid.amount + overdue.amount, unpaid, overdue, paid };
+    }),
+    shareReplay({ refCount: true }),
+  );
+
   onDeleteAllPaid(): void {
     const dialogRef = this.dialog.open(ConfirmDialog, {
       data: {
@@ -278,6 +350,10 @@ export class DebtCardList {
   }
 
   /** Helpers */
+  debtsFor(debts: DebtColumns | null, status: DebtStatus): IDebt[] {
+    return debts?.[status] ?? [];
+  }
+
   trackByDebtId(index: number, debt: IDebt): string {
     return debt._id;
   }

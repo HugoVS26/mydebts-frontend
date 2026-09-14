@@ -1,8 +1,13 @@
-.debt-list {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+@use '../../styles/mixins' as mix;
+@use '../../styles/variables' as vars;
+
+.debt-list-page {
+  @include mix.page-container;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  color: var(--mat-sys-on-surface);
+
+  @media (max-width: #{vars.$breakpoint-tablet - 1px}) {
+    max-width: vars.$max-width-tablet;
+  }
 }

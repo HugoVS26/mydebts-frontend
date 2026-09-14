@@ -1,167 +1,286 @@
-<div class="debt-list__header">
-  <div class="debt-list__mode-toggle">
-    <mat-button-toggle-group [value]="mode" (change)="toggleMode($event.value)">
-      <mat-button-toggle value="creditor">I'm Creditor</mat-button-toggle>
-      <mat-button-toggle value="debtor">I'm Debtor</mat-button-toggle>
-    </mat-button-toggle-group>
+@let debts = filteredDebts$ | async;
+
+@let desktop = isDesktop$ | async;
+@let summary = summary$ | async;
+
+<ng-template #modeToggle let-compact="compact">
+  <div
+    class="mode-toggle"
+    [class.mode-toggle--compact]="compact"
+    role="group"
+    aria-label="Viewing as"
+  >
+    <button
+      type="button"
+      class="mode-toggle__option"
+      [class.mode-toggle__option--selected]="mode === 'creditor'"
+      [attr.aria-pressed]="mode === 'creditor'"
+      (click)="toggleMode('creditor')"
+    >
+      @if (mode === 'creditor') {
+        <mat-icon class="mode-toggle__icon" fontSet="material-symbols-outlined">check</mat-icon>
+      }
+      {{ compact ? 'Creditor' : "I'm Creditor" }}
+    </button>
+    <button
+      type="button"
+      class="mode-toggle__option"
+      [class.mode-toggle__option--selected]="mode === 'debtor'"
+      [attr.aria-pressed]="mode === 'debtor'"
+      (click)="toggleMode('debtor')"
+    >
+      @if (mode === 'debtor') {
+        <mat-icon class="mode-toggle__icon" fontSet="material-symbols-outlined">check</mat-icon>
+      }
+      {{ compact ? 'Debtor' : "I'm Debtor" }}
+    </button>
   </div>
+</ng-template>
 
-  <div class="debt-list__filters">
-    <mat-form-field appearance="outline" class="debt-list__select">
-      <mat-label>Sort debts</mat-label>
-      <mat-select [(value)]="selectedSort" (selectionChange)="applySortSelection($event.value)">
-        @for (option of sortOptions; track option.value) {
-        <mat-option [value]="option.value">{{ option.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="debt-list__select">
-      <mat-label>{{ mode === 'debtor' ? 'Filter by creditors' : 'Filter by debtors' }}</mat-label>
-      <mat-select [(value)]="selectedDebtors" (selectionChange)="applyDebtorSelection($event.value)" multiple>
-        <mat-select-trigger>
-          {{ firstSelectedDebtorName }}
-          @if (selectedDebtors.length > 1) {
-          <span class="additional-selection">
-            (+{{ selectedDebtors.length - 1 }} {{ selectedDebtors.length === 2 ? 'other' : 'others' }})
+@if (desktop) {
+  <section class="summary" aria-label="Debts summary">
+    <div class="summary__totals">
+      <span class="summary__amount">
+        <span class="summary__mode-label">{{ mode === 'debtor' ? 'You owe' : 'Owed to you' }}</span>
+        <span class="summary__total">{{ summary?.total ?? 0 | number: '1.2-2' : 'es-ES' }} €</span>
+      </span>
+      <span class="summary__sep" aria-hidden="true"></span>
+      <span class="summary__stats">
+        @for (column of columns; track column.status) {
+          <span class="summary__stat summary__stat--{{ column.status }}">
+            <span class="summary__dot" aria-hidden="true"></span>
+            {{ summary?.[column.status]?.count ?? 0 }} {{ column.status }} ·
+            {{ summary?.[column.status]?.amount ?? 0 | number: '1.2-2' : 'es-ES' }} €
           </span>
+        }
+      </span>
+    </div>
+  </section>
+
+  <section class="controls" aria-label="Debt list controls">
+    <div class="controls__mode">
+      <ng-container *ngTemplateOutlet="modeToggle; context: { compact: false }" />
+    </div>
+
+    <div class="controls__tools">
+      <mat-form-field appearance="outline" class="controls__select" subscriptSizing="dynamic">
+        <mat-label>Sort debts</mat-label>
+        <mat-icon matIconPrefix class="controls__select-icon" fontSet="material-symbols-outlined">
+          swap_vert
+        </mat-icon>
+        <mat-select [(value)]="selectedSort" (selectionChange)="applySortSelection($event.value)">
+          @for (option of sortOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
           }
-        </mat-select-trigger>
-        @for (debtor of (debtors$ | async); track debtor._id) {
-        <mat-option [value]="debtor._id">{{ debtor.name }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-  </div>
-</div>
+        </mat-select>
+      </mat-form-field>
 
-@if (isDesktop$ | async) {
-<div class="debt-list">
-  <div class="debt-list__column debt-list__column--overdue"
-    [class.debt-list__column--empty]="!(filteredDebts$ | async)?.['overdue']?.length">
-    <h3 class="debt-list__column-title">Overdue @if ((filteredDebts$ | async)?.['overdue']?.length) {
-      <span class="debt-list__column-badge">{{ (filteredDebts$ | async)?.['overdue']?.length }}</span>
-      }
-    </h3>
-    <ol class="debt-list__cards">
-      @for (debt of (filteredDebts$ | async)?.['overdue']; track trackByDebtId($index, debt)) {
-      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
-      } @empty {
-      <li class="debt-list__card-item debt-list__empty">
-        No overdue debts. <br> Good job staying on top of things! 💪
-      </li>
-      }
-    </ol>
-  </div>
+      <mat-form-field appearance="outline" class="controls__select" subscriptSizing="dynamic">
+        <mat-label>{{ mode === 'debtor' ? 'Filter by creditors' : 'Filter by debtors' }}</mat-label>
+        <mat-icon matIconPrefix class="controls__select-icon" fontSet="material-symbols-outlined">
+          filter_list
+        </mat-icon>
+        <mat-select
+          [(value)]="selectedDebtors"
+          (selectionChange)="applyDebtorSelection($event.value)"
+          multiple
+        >
+          <mat-select-trigger>
+            {{ firstSelectedDebtorName }}
+            @if (selectedDebtors.length > 1) {
+              <span class="controls__select-extra">
+                (+{{ selectedDebtors.length - 1 }}
+                {{ selectedDebtors.length === 2 ? 'other' : 'others' }})
+              </span>
+            }
+          </mat-select-trigger>
+          @for (debtor of debtors$ | async; track debtor._id) {
+            <mat-option [value]="debtor._id">{{ debtor.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
 
-  <div class="debt-list__column debt-list__column--unpaid">
-    <h3 class="debt-list__column-title">Unpaid @if ((filteredDebts$ | async)?.['unpaid']?.length) {
-      <span class="debt-list__column-badge">{{ (filteredDebts$ | async)?.['unpaid']?.length }}</span>
-      }
-    </h3>
-    <ol class="debt-list__cards">
-      @for (debt of (filteredDebts$ | async)?.['unpaid']; track trackByDebtId($index, debt)) {
-      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
-      } @empty {
-      <li class="debt-list__card-item debt-list__empty">
-        <button class="debt-list__empty-button" routerLink="/debts/new" [queryParams]="{ mode: mode }">
-          <mat-icon fontSet="material-symbols-outlined" class="debt-list__empty-icon">add</mat-icon>
-        </button>
-      </li>
-      }
-    </ol>
-  </div>
+      <span class="controls__sep" aria-hidden="true"></span>
 
-  <div class="debt-list__column debt-list__column--paid"
-    [class.debt-list__column--empty]="!(filteredDebts$ | async)?.['paid']?.length">
-    <div class="debt-list__column-header">
-      <h3 class="debt-list__column-title">Paid @if ((filteredDebts$ | async)?.['paid']?.length) {
-        <span class="debt-list__column-badge">{{ (filteredDebts$ | async)?.['paid']?.length }}</span>
-        }
-      </h3>
-      @if ((filteredDebts$ | async)?.['paid']?.length) {
-      <button mat-icon-button class="debt-list__unpaid-button" (click)="onDeleteAllPaid()" title="Delete all paid debts"
-        aria-label="Delete all paid debts">
-        <mat-icon>delete_sweep</mat-icon>
-      </button>
-      }
+      <a
+        mat-flat-button
+        class="controls__add"
+        routerLink="/debts/new"
+        [queryParams]="{ mode: mode }"
+      >
+        <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+        Add debt
+      </a>
     </div>
-    <ol class="debt-list__cards">
-      @for (debt of (filteredDebts$ | async)?.['paid']; track trackByDebtId($index, debt)) {
-      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
-      } @empty {
-      <li class="debt-list__card-item debt-list__empty">
-        No paid debts found. <br> Looks like you're all caught up! ✅
-      </li>
-      }
-    </ol>
-  </div>
-</div>
+  </section>
 } @else {
-<mat-tab-group animationDuration="200ms" class="debt-list__tabs" (touchstart)="onTouchStart($event)"
-  (touchend)="onTouchEnd($event)">
-  <mat-tab>
-    <ng-template mat-tab-label>
-      Unpaid
-      @if ((filteredDebts$ | async)?.['unpaid']?.length) {
-      <span class="debt-list__tab-badge">{{ (filteredDebts$ | async)?.['unpaid']?.length }}</span>
-      }
-    </ng-template>
-    <ol class="debt-list__cards">
-      @for (debt of (filteredDebts$ | async)?.['unpaid']; track trackByDebtId($index, debt)) {
-      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
-      } @empty {
-      <li class="debt-list__card-item debt-list__empty">
-        <button class="debt-list__empty-button" routerLink="/debts/new" [queryParams]="{ mode: mode }">
-          <mat-icon fontSet="material-symbols-outlined" class="debt-list__empty-icon">add</mat-icon>
-        </button>
-      </li>
+  <header class="mobile-header">
+    <div class="mobile-header__row">
+      <span class="mobile-header__total">
+        <span class="mobile-header__mode-label">{{
+          mode === 'debtor' ? 'You owe' : 'Owed to you'
+        }}</span>
+        <span class="mobile-header__amount"
+          >{{ summary?.total ?? 0 | number: '1.2-2' : 'es-ES' }} €</span
+        >
+      </span>
+      <ng-container *ngTemplateOutlet="modeToggle; context: { compact: true }" />
+    </div>
+
+    <div class="mobile-header__chips">
+      <div class="chip">
+        <mat-icon class="chip__icon" fontSet="material-symbols-outlined">swap_vert</mat-icon>
+        <span class="chip__label">{{ selectedSortShortLabel }}</span>
+        <mat-icon class="chip__arrow" fontSet="material-symbols-outlined">arrow_drop_down</mat-icon>
+        <mat-select
+          class="chip__select"
+          aria-label="Sort debts"
+          [panelWidth]="null"
+          [(value)]="selectedSort"
+          (selectionChange)="applySortSelection($event.value)"
+        >
+          @for (option of sortOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </div>
+
+      <div class="chip">
+        <mat-icon class="chip__icon" fontSet="material-symbols-outlined">filter_list</mat-icon>
+        <span class="chip__label">
+          {{ mode === 'debtor' ? 'Creditors' : 'Debtors' }}
+          @if (selectedDebtors.length) {
+            · {{ selectedDebtors.length }}
+          }
+        </span>
+        <mat-icon class="chip__arrow" fontSet="material-symbols-outlined">arrow_drop_down</mat-icon>
+        <mat-select
+          class="chip__select"
+          [attr.aria-label]="mode === 'debtor' ? 'Filter by creditors' : 'Filter by debtors'"
+          [panelWidth]="null"
+          [(value)]="selectedDebtors"
+          (selectionChange)="applyDebtorSelection($event.value)"
+          multiple
+        >
+          @for (debtor of debtors$ | async; track debtor._id) {
+            <mat-option [value]="debtor._id">{{ debtor.name }}</mat-option>
+          }
+        </mat-select>
+      </div>
+    </div>
+  </header>
+}
+
+<ng-template #columnBody let-column="column">
+  @let columnDebts = debtsFor(debts, column.status);
+  @if (columnDebts.length) {
+    <ol class="board__cards">
+      @for (debt of columnDebts; track trackByDebtId($index, debt)) {
+        <li class="board__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
       }
     </ol>
-  </mat-tab>
-
-  <mat-tab>
-    <ng-template mat-tab-label>
-      Overdue
-      @if ((filteredDebts$ | async)?.['overdue']?.length) {
-      <span class="debt-list__tab-badge">{{ (filteredDebts$ | async)?.['overdue']?.length }}</span>
-      }
-    </ng-template>
-    <ol class="debt-list__cards">
-      @for (debt of (filteredDebts$ | async)?.['overdue']; track trackByDebtId($index, debt)) {
-      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
-      } @empty {
-      <li class="debt-list__card-item debt-list__empty">
-        No overdue debts. <br> Good job staying on top of things! 💪
-      </li>
-      }
-    </ol>
-  </mat-tab>
-
-  <mat-tab>
-    <ng-template mat-tab-label>
-      Paid
-      @if ((filteredDebts$ | async)?.['paid']?.length) {
-      <span class="debt-list__tab-badge">{{ (filteredDebts$ | async)?.['paid']?.length }}</span>
-      }
-    </ng-template>
-    <div class="debt-list__tab-actions">
-      @if ((filteredDebts$ | async)?.['paid']?.length) {
-      <button mat-icon-button class="debt-list__unpaid-button" (click)="onDeleteAllPaid()" title="Delete all paid debts"
-        aria-label="Delete all paid debts">
-        <mat-icon class="dent-list__unpaid-icon">delete_sweep</mat-icon>
-      </button>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-state__icon-wrap">
+        <mat-icon class="empty-state__icon" fontSet="material-symbols-outlined">{{
+          column.emptyIcon
+        }}</mat-icon>
+      </span>
+      <div class="empty-state__text">
+        @for (line of column.emptyMessage; track $index) {
+          <p class="empty-state__message">{{ line }}</p>
+        }
+      </div>
+      @if (column.status === 'unpaid') {
+        <a
+          mat-stroked-button
+          class="empty-state__action"
+          routerLink="/debts/new"
+          [queryParams]="{ mode: mode }"
+        >
+          <mat-icon fontSet="material-symbols-outlined">add</mat-icon>
+          Add a debt
+        </a>
       }
     </div>
-    <ol class="debt-list__cards">
-      @for (debt of (filteredDebts$ | async)?.['paid']; track trackByDebtId($index, debt)) {
-      <li class="debt-list__card-item"><app-debt-card [debt]="debt" [mode]="mode" /></li>
-      } @empty {
-      <li class="debt-list__card-item debt-list__empty">
-        No paid debts found. <br> Looks like you're all caught up! ✅
-      </li>
-      }
-    </ol>
-  </mat-tab>
-</mat-tab-group>
+  }
+</ng-template>
+
+<ng-template #columnTitle let-column="column">
+  <mat-icon class="board__column-icon" fontSet="material-symbols-outlined">{{
+    column.icon
+  }}</mat-icon>
+  <span class="board__column-title">{{ column.title }}</span>
+  <span class="board__count board__count--{{ column.status }}">{{
+    debtsFor(debts, column.status).length
+  }}</span>
+</ng-template>
+
+@if (desktop) {
+  <div class="board">
+    @for (column of columns; track column.status) {
+      <section
+        class="board__column board__column--{{ column.status }}"
+        [attr.aria-label]="column.title + ' debts'"
+      >
+        <span class="board__accent" aria-hidden="true"></span>
+        <header class="board__column-header">
+          <h3 class="board__title-group">
+            <ng-container *ngTemplateOutlet="columnTitle; context: { column }" />
+          </h3>
+          @if (column.status === 'paid' && debts?.paid?.length) {
+            <button
+              mat-stroked-button
+              class="board__column-action"
+              type="button"
+              (click)="onDeleteAllPaid()"
+              title="Delete all paid debts"
+              aria-label="Delete all paid debts"
+            >
+              <mat-icon fontSet="material-symbols-outlined">delete_sweep</mat-icon>
+              Clear all
+            </button>
+          }
+        </header>
+        <div class="board__body">
+          <ng-container *ngTemplateOutlet="columnBody; context: { column }" />
+        </div>
+      </section>
+    }
+  </div>
+} @else {
+  <mat-tab-group
+    animationDuration="200ms"
+    class="board-tabs"
+    (touchstart)="onTouchStart($event)"
+    (touchend)="onTouchEnd($event)"
+  >
+    @for (column of columns; track column.status) {
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <span class="board-tabs__label">
+            <ng-container *ngTemplateOutlet="columnTitle; context: { column }" />
+          </span>
+        </ng-template>
+        @if (column.status === 'paid' && debts?.paid?.length) {
+          <div class="board-tabs__actions">
+            <button
+              mat-stroked-button
+              class="board__column-action"
+              type="button"
+              (click)="onDeleteAllPaid()"
+              title="Delete all paid debts"
+              aria-label="Delete all paid debts"
+            >
+              <mat-icon fontSet="material-symbols-outlined">delete_sweep</mat-icon>
+              Clear all
+            </button>
+          </div>
+        }
+        <div class="board__body">
+          <ng-container *ngTemplateOutlet="columnBody; context: { column }" />
+        </div>
+      </mat-tab>
+    }
+  </mat-tab-group>
 }
