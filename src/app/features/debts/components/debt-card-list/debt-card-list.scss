@@ -138,7 +138,6 @@ $note-colors: (
         container-height: 48px,
         container-vertical-padding: 12px,
         container-text-size: 14px,
-        outlined-container-shape: 4px,
         outlined-outline-color: var(--mat-sys-outline),
         outlined-label-text-color: var(--mat-sys-on-surface-variant),
       )
@@ -171,9 +170,7 @@ $note-colors: (
       (
         filled-container-height: 44px,
         filled-horizontal-padding: 24px,
-        filled-icon-spacing: 8px,
         filled-icon-offset: -8px,
-        filled-container-color: var(--mat-sys-primary),
         filled-label-text-color: var(--app-on-primary),
         filled-label-text-size: 14px,
         filled-label-text-weight: 700,
@@ -213,9 +210,6 @@ $note-colors: (
     font-weight: 700;
     white-space: nowrap;
     cursor: pointer;
-    transition:
-      background-color 0.15s ease,
-      color 0.15s ease;
 
     &:hover:not(.mode-toggle__option--selected) {
       background-color: var(--mat-sys-surface-container-high);
@@ -432,8 +426,6 @@ $note-colors: (
     font-size: 12px;
     font-weight: 700;
     line-height: 1;
-    letter-spacing: 0;
-    text-transform: none;
   }
 
   &__column-action {
@@ -449,12 +441,6 @@ $note-colors: (
         outlined-label-text-weight: 700,
       )
     );
-
-    .mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
   }
 
   &__body {
@@ -549,7 +535,6 @@ $note-colors: (
       (
         outlined-container-height: 40px,
         outlined-horizontal-padding: 20px,
-        outlined-icon-spacing: 8px,
         outlined-icon-offset: -6px,
         outlined-outline-color: var(--mat-sys-outline),
         outlined-label-text-color: var(--app-primary-text),
@@ -557,13 +542,14 @@ $note-colors: (
         outlined-label-text-weight: 700,
       )
     );
-
-    .mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
   }
+}
+
+.board__column-action .mat-icon,
+.empty-state__action .mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 // ---------------------------------------------------------------------------
@@ -593,15 +579,15 @@ $note-colors: (
         min-width: 0;
         padding: 0 8px;
       }
+    }
 
-      // Active-tab underline takes the status accent, like the desktop
-      // column bars. Tabs follow the COLUMNS order: unpaid, overdue, paid.
-      @each $status, $color in $status-colors {
-        $i: list.index(map.keys($status-colors), $status);
+    // Active-tab underline takes the status accent, like the desktop
+    // column bars. Tabs follow the COLUMNS order: unpaid, overdue, paid.
+    @each $status, $color in $status-colors {
+      $i: list.index(map.keys($status-colors), $status);
 
-        .mat-mdc-tab:nth-child(#{$i}) .mdc-tab-indicator__content--underline {
-          border-color: $color;
-        }
+      .mat-mdc-tab:nth-child(#{$i}) .mdc-tab-indicator__content--underline {
+        border-color: $color;
       }
     }
 
