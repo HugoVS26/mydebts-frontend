@@ -104,9 +104,11 @@ body {
   }
 }
 
-// Home page uses the "background" tone as its page canvas so surface-toned
-// blocks (toolbar, board, CTA band) stand out. Toggled by HomePage.
-body.home-page {
+// Home and debts pages use the "background" tone as their page canvas so
+// surface-toned blocks (toolbar, board, controls band) stand out.
+// Toggled by HomePage / DebtListPage.
+body.home-page,
+body.debts-page {
   background-color: var(--mat-sys-background);
 }
 

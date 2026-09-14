@@ -9,6 +9,12 @@ $unpaid-dark: color.adjust($unpaid, $lightness: -10%);
 $overdue-dark: color.adjust($overdue, $lightness: -10%);
 $paid-dark: color.adjust($paid, $lightness: -10%);
 
+// Status accents (badges, column bars, summary dots) - see mydebts.pen `status/*`
+$status-unpaid: #e6c46a;
+$status-overdue: #f0776b;
+$status-paid: #b4d257;
+$status-on-badge: #1f1b12;
+
 // Toolbar height
 $toolbar-standard-height: 64px;
 $toolbar-mobile-height: 56px;
@@ -17,6 +23,7 @@ $toolbar-mobile-height: 56px;
 $max-width-default: 1200px;
 $max-width-narrow: 800px;
 $max-width-wide: 1440px;
+$max-width-tablet: 640px;
 
 // Breakpoints
 $breakpoint-mobile: 768px;

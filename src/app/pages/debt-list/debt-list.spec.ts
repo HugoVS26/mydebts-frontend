@@ -2,10 +2,14 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
 
 import { DebtListPage } from './debt-list';
 import { DebtsService } from '../../features/debts/services/debts';
 import { provideRouter } from '@angular/router';
+
+registerLocaleData(localeEs);
 
 describe('Given a DebtListComponent page', () => {
   let component: DebtListPage;

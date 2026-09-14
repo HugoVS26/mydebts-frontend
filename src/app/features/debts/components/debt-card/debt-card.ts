@@ -22,7 +22,7 @@ export class DebtCard {
 
   statusIcons = {
     paid: { icon: 'check', fontSet: 'material-icons' },
-    unpaid: { icon: 'progress_activity', fontSet: 'material-symbols-outlined' },
+    unpaid: { icon: 'hourglass_top', fontSet: 'material-symbols-outlined' },
     overdue: { icon: 'skull', fontSet: 'material-symbols-outlined' },
   };
 
