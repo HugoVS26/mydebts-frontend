@@ -68,7 +68,7 @@ describe('Given a DebtCardComponent', () => {
       });
 
       expect(component.statusIcons.unpaid).toEqual({
-        icon: 'progress_activity',
+        icon: 'hourglass_top',
         fontSet: 'material-symbols-outlined',
       });
 
